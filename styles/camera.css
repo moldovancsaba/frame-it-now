@@ -1,0 +1,59 @@
+/* Camera container - provides the main positioning context */
+.camera-container {
+  @apply relative;
+  @apply w-full;
+  @apply h-full;
+  @apply flex;
+  @apply items-center;
+  @apply justify-center;
+  @apply overflow-hidden;
+}
+
+/* Preview container - maintains aspect ratio and centers content */
+.preview-container {
+  @apply relative;
+  @apply w-full;
+  @apply max-w-[320px];  /* Matches PREVIEW_SIZE from CameraComponent */
+  @apply aspect-square;
+  @apply overflow-hidden;
+}
+
+/* Video preview - perfectly centered and scaled */
+.video-preview {
+  @apply absolute;
+  @apply left-1/2;
+  @apply top-1/2;
+  @apply -translate-x-1/2;
+  @apply -translate-y-1/2;
+  @apply w-full;
+  @apply h-full;
+  @apply object-cover;
+  /* Mirror effect for selfie view */
+  @apply scale-x-[-1];
+}
+
+/* Overlay guide - centered and layered correctly */
+.overlay-guide {
+  @apply absolute;
+  @apply left-1/2;
+  @apply top-1/2;
+  @apply -translate-x-1/2;
+  @apply -translate-y-1/2;
+  @apply pointer-events-none;
+  @apply z-20;
+  /* Smooth transitions for any guide adjustments */
+  @apply transition-transform;
+  @apply duration-200;
+  @apply ease-out;
+}
+
+/* Photo frame - perfectly aligned with guide and preview */
+.photo-frame {
+  @apply absolute;
+  @apply left-1/2;
+  @apply top-1/2;
+  @apply -translate-x-1/2;
+  @apply -translate-y-1/2;
+  @apply pointer-events-none;
+  @apply z-10;
+}
