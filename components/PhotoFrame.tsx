@@ -64,7 +64,6 @@ const PhotoFrame = forwardRef<HTMLImageElement, PhotoFrameProps>(function PhotoF
     className = '',
     style,
     onError,
-    objectFit,
     isReady = true,
     onFrameDimensionsChange,
     ...otherProps
@@ -94,20 +93,11 @@ const PhotoFrame = forwardRef<HTMLImageElement, PhotoFrameProps>(function PhotoF
 
   // Update frame loaded state when dimensions are set
 
-const imageStyle: CSSProperties = {
-    ...style,
-    objectFit: objectFit || 'cover',
-    maxHeight: '90vh',
-    opacity: isReady ? 0.8 : 0,
-    transition: 'opacity 0.3s ease',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    pointerEvents: 'none',
-    borderRadius: '8px'
-  };
+  const imageClasses = [
+    'photo-frame-overlay',
+    !isReady && 'photo-frame-hidden',
+    className
+  ].filter(Boolean).join(' ');
 
   return (
     <Image
@@ -115,8 +105,8 @@ const imageStyle: CSSProperties = {
       src={src}
       width={1080}
       height={1080}
-      className={`video-preview ${className}`}
-      style={imageStyle}
+      className={imageClasses}
+      style={style}
       alt="Photo frame overlay"
       onError={handleError}
       onLoad={handleFrameLoad}
