@@ -7,6 +7,8 @@ const nextConfig = {
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    domains: ['i.ibb.co', 'localhost'],
+    unoptimized: true,
   },
   webpack: (config, { dev, isServer }) => {
     // Optimize image processing

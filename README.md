@@ -56,8 +56,32 @@ This project uses TypeScript for enhanced type safety and developer experience. 
 - Strict type checking enabled
 - Modern TypeScript/React patterns
 
-## Deploy on Vercel
+## Testing Status
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Testing has been intentionally omitted from this project.
+The current approach is to focus on direct implementation and
+feature enhancements without automated testing frameworks.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deployment (v1.3.0)
+
+Follow these steps to deploy the application:
+
+1. Build Verification
+   ```bash
+   npm run build
+   ```
+   Ensure no build errors are present
+
+2. Development Testing
+   ```bash
+   npm run dev
+   ```
+   Verify all features in development environment
+
+3. Production Deployment
+   ```bash
+   npm run build
+   vercel --prod
+   ```
+
+For detailed deployment information, check our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying).

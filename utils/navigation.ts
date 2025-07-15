@@ -37,10 +37,3 @@ export class NavigationService implements Navigation {
  */
 export const defaultNavigation = new NavigationService();
 
-/**
- * Test-friendly mock navigation service
- * Use this in tests to avoid actual page reloads
- */
-export const createMockNavigation = (): Navigation => ({
-  reload: jest.fn()
-});

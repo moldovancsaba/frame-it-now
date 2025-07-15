@@ -81,10 +81,6 @@ const fetchImages = async (): Promise<void> => {
             src={images[index]}
             width={1024}
             height={1024}
-            effects={{
-              brightness: 1.1,
-              contrast: 1.05
-            }}
           />
         ) : (
           <div style={{ color: '#fff', fontSize: 24 }}>No images to display.</div>

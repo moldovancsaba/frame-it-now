@@ -7,6 +7,11 @@ import { useEffect, useRef, useState } from 'react';
 interface UseCameraOptions {
   /** Camera facing mode - 'user' for front camera, 'environment' for back camera */
   facingMode?: 'user' | 'environment';
+  /** Optional frame dimensions for video constraints */
+  frameDimensions?: {
+    width: number;
+    height: number;
+  };
 }
 
 /**
@@ -16,14 +21,17 @@ interface UseCameraOptions {
 interface UseCameraReturn {
   /** Reference to the video element for camera stream display */
   videoRef: React.RefObject<HTMLVideoElement>;
-  /** Indicates if the camera is initialized and ready */
-  isReady: boolean;
-  /** Contains any error that occurred during camera operations */
-  error: Error | null;
+  /** Current initialization status of the camera */
+  initializationStatus: {
+    state: 'initializing' | 'ready' | 'error';
+    message?: string;
+  };
   /** Initializes and starts the camera stream */
   startCamera: () => Promise<void>;
   /** Stops the camera stream and releases resources */
   stopCamera: () => void;
+  /** Retries camera initialization after failure */
+  retryCamera: () => Promise<void>;
 }
 
 /**
@@ -33,11 +41,24 @@ interface UseCameraReturn {
  * @param {UseCameraOptions} options - Camera configuration options
  * @returns {UseCameraReturn} Camera controls and state
  */
-export const useCamera = ({ facingMode = 'user' }: UseCameraOptions = {}): UseCameraReturn => {
+export const useCamera = ({ facingMode = 'user', frameDimensions }: UseCameraOptions = {}): UseCameraReturn => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isReady, setIsReady] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const [initializationStatus, setInitializationStatus] = useState<{
+    state: 'initializing' | 'ready' | 'error';
+    message?: string;
+  }>({ state: 'initializing' });
+
+  // Helper function to get video constraints
+  const getVideoConstraints = () => ({
+    video: {
+      facingMode,
+      ...(frameDimensions && {
+        width: { ideal: frameDimensions.width },
+        height: { ideal: frameDimensions.height }
+      })
+    }
+  });
 
   const stopCamera = () => {
     if (streamRef.current) {
@@ -47,13 +68,12 @@ export const useCamera = ({ facingMode = 'user' }: UseCameraOptions = {}): UseCa
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
-    setIsReady(false);
+    setInitializationStatus({ state: 'initializing' });
   };
 
   const startCamera = async () => {
     try {
-      setError(null);
-      setIsReady(false);
+      setInitializationStatus({ state: 'initializing' });
       
       // Clean up any existing stream
       stopCamera();
@@ -63,10 +83,8 @@ export const useCamera = ({ facingMode = 'user' }: UseCameraOptions = {}): UseCa
         throw new Error('Camera access not supported in this browser');
       }
 
-      // Request camera access
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode }
-      }).catch((err: Error) => {
+      // Request camera access with constraints
+      const stream = await navigator.mediaDevices.getUserMedia(getVideoConstraints()).catch(err => {
         // Handle specific permission errors
         if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
           throw new Error('Camera access denied. Please grant permission to use your camera.');
@@ -85,14 +103,15 @@ export const useCamera = ({ facingMode = 'user' }: UseCameraOptions = {}): UseCa
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        // Wait for video to be ready before setting isReady
+        // Wait for video to be ready before setting ready state
         videoRef.current.onloadedmetadata = () => {
-          setIsReady(true);
+          setInitializationStatus({ state: 'ready' });
         };
       }
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to start camera');
-      setError(error);
+      const errorMessage = error.message || 'Camera initialization failed';
+      setInitializationStatus({ state: 'error', message: errorMessage });
       console.error('Camera initialization error:', error);
     }
   };
@@ -101,18 +120,32 @@ export const useCamera = ({ facingMode = 'user' }: UseCameraOptions = {}): UseCa
   useEffect(() => {
     startCamera();
     
+    // Define cleanup function for stream
+    const cleanupStream = () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
+    };
+
     // Cleanup on unmount
     return () => {
-      stopCamera();
+      cleanupStream();
+      setInitializationStatus({ state: 'initializing' });
     };
-  }, [facingMode]);
+  }, [facingMode, frameDimensions]);
+
+  const retryCamera = async () => {
+    await stopCamera();
+    await startCamera();
+  };
 
   return {
     videoRef,
-    isReady,
-    error,
+    initializationStatus,
     startCamera,
     stopCamera,
+    retryCamera,
   };
 };
 

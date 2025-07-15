@@ -1,5 +1,74 @@
 # Release Notes
 
+## [v2.0.0] — 2025-07-15T13:41:30.000Z
+
+### Added
+- Major camera preview and capture system overhaul
+  - Implemented natural mirror-like preview for selfie camera
+  - Enhanced capture system to maintain correct orientation
+  - Fixed image loader configuration for frame overlays
+  - Optimized canvas operations for mirrored captures
+
+### Technical Details
+- Added CSS transform for preview mirroring: `transform: scaleX(-1)`
+- Implemented canvas context transformation for capture mirroring
+- Updated Next.js image configuration for external frame sources
+- Enhanced error handling for image loading and camera initialization
+- Fixed TypeScript type definitions and linting issues
+
+### Issues Resolved
+1. Camera Preview Issues:
+   - Fixed unmirrored selfie preview that felt unnatural to users
+   - Resolved conflict between preview and capture orientations
+   - Fixed frame overlay positioning in mirrored view
+
+2. Image Processing:
+   - Resolved canvas context transformation for correct capture orientation
+   - Fixed frame overlay compositing in mirrored context
+   - Optimized image processing pipeline for performance
+
+3. Build and TypeScript:
+   - Fixed duplicate interface properties
+   - Resolved ESLint warnings for unused imports
+   - Added proper return types for async functions
+   - Enhanced type safety in image processing functions
+
+### Developer Notes
+- The implementation follows mobile camera app conventions
+- Preview mirroring uses CSS for optimal performance
+- Canvas operations handle mirroring during capture
+- Clean separation between preview display and image processing
+
+### Added
+- New services directory structure implementation
+- Enhanced component integration system
+- Improved cross-service communication
+
+### Technical Details
+- Organized services into dedicated directories
+- Implemented type-safe service interfaces
+- Enhanced component relationship documentation
+- Updated architecture documentation
+
+## [v1.2.0] — 2024-01-26T10:00:00.000Z
+
+### Added
+- Enhanced camera initialization with retry mechanism
+- Improved error handling and user feedback
+- Comprehensive testing coverage
+
+## [v1.0.1] — 2024-01-25T14:30:00.000Z
+
+### TypeScript Improvements Needed
+- Type definition fixes required in test files
+- ESLint compliance updates for explicit typing
+- Build process type validation enhancement
+
+### Technical Details
+- Return type fixes needed in PhotoFrame component
+- Test suite type definitions to be updated
+- Import statement corrections required
+
 ## [v1.0.0] — 2024-01-23T10:00:00.000Z
 
 ### Major Bug Fixes

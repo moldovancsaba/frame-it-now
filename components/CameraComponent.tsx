@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import PhotoFrame from './PhotoFrame';
 import useCamera from '../hooks/useCamera';
 import { defaultNavigation, Navigation } from '../utils/navigation';
 import { capturePhoto, loadImage } from '../utils/photoCapture';
+import { getAvailableScreenSpace, calculateUIPositions } from '../utils/previewSize';
 import OverlayGuide from './OverlayGuide';
+import ErrorBoundary from './ErrorBoundary';
 
 /**
  * Props interface for the CameraComponent
@@ -22,8 +24,19 @@ interface CameraComponentProps {
 }
 
 const DEFAULT_OVERLAY = 'https://i.ibb.co/MDzTJdB8/SEYU-FRAME-1080x1080.png';
-const PHOTO_SIZE = 1080; // Final photo size
-const PREVIEW_SIZE = 320; // Preview component size
+
+// Replace fixed size with dynamic frame dimensions
+/**
+ * Calculates natural dimensions of a given HTML image element
+ * @param frame - The HTML image element to get dimensions from
+ * @returns Object containing width and height in pixels
+ */
+const getFrameDimensions = (frame: HTMLImageElement): { width: number; height: number } => {
+  return {
+    width: frame.naturalWidth,
+    height: frame.naturalHeight
+  };
+};
 
 export default function CameraComponent({
   defaultOverlay = DEFAULT_OVERLAY,
@@ -31,18 +44,40 @@ export default function CameraComponent({
   onError,
   navigation = defaultNavigation,
 }: CameraComponentProps): JSX.Element {
-  const { videoRef: videoRefRaw, isReady, error, startCamera } = useCamera({ facingMode: 'user' });
+  const [frameDimensions, setFrameDimensions] = useState({ width: 1080, height: 1080 }); // Default 1:1 aspect ratio
+  const { videoRef: videoRefRaw, initializationStatus: cameraStatus, startCamera } = useCamera({ 
+    facingMode: 'user',
+    frameDimensions
+  });
   const videoRef = videoRefRaw as React.RefObject<HTMLVideoElement>;
+  const frameRef = useRef<HTMLImageElement>(null);
   const [photo, setPhoto] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
-
-  const overlayUrl = (typeof window !== 'undefined' && typeof localStorage !== 'undefined')
+  const [previewSize, setPreviewSize] = useState({ width: 0, height: 0 });
+const overlayUrl = (typeof window !== 'undefined' && typeof localStorage !== 'undefined')
     ? localStorage.getItem('overlayUrl') || defaultOverlay
     : defaultOverlay;
 
+  // Update preview size when frame dimensions change or on window resize
+  useEffect(() => {
+    const updatePreviewSize = (): void => {
+      const screen = getAvailableScreenSpace();
+      setPreviewSize(screen);
+      setFrameDimensions(screen);
+    };
+
+    // Initial update
+    updatePreviewSize();
+
+    // Update on window resize
+    window.addEventListener('resize', updatePreviewSize);
+    return () => window.removeEventListener('resize', updatePreviewSize);
+  }, []);
+
+
   const handleCapture = async (): Promise<void> => {
-    if (!videoRef.current || !isReady) return;
+    if (!videoRef.current || cameraStatus.state !== 'ready') return;
 
     try {
       setLoading(true);
@@ -50,10 +85,11 @@ export default function CameraComponent({
       setUploadedUrl(null);
 
       const overlay = await loadImage(overlayUrl);
+      const frameDims = getFrameDimensions(overlay);
       const photoData = await capturePhoto({
         video: videoRef.current,
-        width: PHOTO_SIZE,
-        height: PHOTO_SIZE,
+        width: frameDims.width,
+        height: frameDims.height,
         overlayImage: overlay
       });
 
@@ -139,11 +175,11 @@ export default function CameraComponent({
     }
   };
 
-  if (error) {
+  if (cameraStatus.state === 'error') {
     const nav = navigation || defaultNavigation;
     return (
       <div className="error-container">
-        <p>Camera Error: {error.message}</p>
+        <p>Camera Error: {cameraStatus.message}</p>
         <button 
           onClick={() => nav.reload()}
           className="btn btn-primary"
@@ -155,38 +191,81 @@ export default function CameraComponent({
   }
 
   return (
+    <ErrorBoundary
+      fallback={({ error }) => (
+        <div className="error-container">
+          <p>Camera Error: {error.message}</p>
+          <button 
+            onClick={() => (navigation ?? defaultNavigation).reload()}
+            className="btn btn-primary"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+    >
     <div className="camera-container" data-testid="camera-container">
-      {!photo ? (
-        <div className="preview-container">
-          {/* Video preview - centered and scaled */}
-          <video 
-            ref={videoRef}
-            autoPlay 
-            playsInline 
-            muted 
-            className="video-preview"
-          />
-          {/* Face overlay guide - centered with frame and preview */}
-          <OverlayGuide 
-            width={PREVIEW_SIZE * 0.625} 
-            height={PREVIEW_SIZE * 0.625} 
-            className="overlay-guide"
-          />
-          {/* Photo frame - aligned with guide and preview */}
-          <PhotoFrame
-            src={overlayUrl}
-            width={PREVIEW_SIZE}
-            height={PREVIEW_SIZE}
-            className="photo-frame"
-          />
+  {!photo ? (
+<div className="preview-container" style={{ 
+            position: 'relative', 
+            width: previewSize.width || '100%',
+            height: previewSize.height || '100%',
+            maxWidth: '100vw',
+            maxHeight: '100vh',
+            margin: '0 auto'
+          }}>
+          {cameraStatus.state === 'initializing' && (
+            <div className="loading-container">
+              <span className="loading-spinner" />
+              <p>Preparing camera...</p>
+            </div>
+          )}
+          {previewSize.width > 0 && (
+            <>
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                onCanPlay={() => {
+                  if (videoRef.current) {
+                    videoRef.current.play()
+                      .catch(err => {
+                        console.error('Video playback failed:', err);
+                        onError?.(new Error('Failed to start video playback'));
+                      });
+                  }
+                }}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  transform: 'scaleX(-1)',
+                  display: cameraStatus.state === 'ready' ? 'block' : 'none'
+                }}
+              />
+              <OverlayGuide 
+                width={previewSize.width}
+                height={previewSize.height}
+                className="overlay-guide"
+              />
+              <PhotoFrame
+                src={overlayUrl}
+                width={previewSize.width}
+                height={previewSize.height}
+                className="photo-frame"
+                ref={frameRef}
+              />
+            </>
+          )}
         </div>
       ) : (
         <div className="photo-container" data-testid="photo-container">
           <Image
             src={photo}
             alt="captured photo"
-            width={PREVIEW_SIZE}
-            height={PREVIEW_SIZE}
+            width={320}
+            height={320}
             className="photo-output"
             unoptimized
             priority
@@ -194,12 +273,12 @@ export default function CameraComponent({
         </div>
       )}
 
-      <div className="button-container">
+      <div className="button-container" style={calculateUIPositions(previewSize).buttons}>
         {!photo && (
           <button 
             onClick={handleCapture} 
-            disabled={!isReady || loading}
-            className={`btn btn-primary ${!isReady || loading ? 'btn-disabled' : ''}`}
+            disabled={cameraStatus.state !== 'ready' || loading}
+            className={`btn btn-primary ${cameraStatus.state !== 'ready' || loading ? 'btn-disabled' : ''}`}
           >
             {loading ? (
               <React.Fragment>
@@ -237,6 +316,7 @@ export default function CameraComponent({
         </a>
       )}
     </div>
+    </ErrorBoundary>
   );
 }
 

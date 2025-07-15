@@ -1,59 +1,76 @@
-/* Camera container - provides the main positioning context */
+/* Camera container - fullscreen modal with semi-transparent background */
 .camera-container {
-  @apply relative;
-  @apply w-full;
-  @apply h-full;
-  @apply flex;
-  @apply items-center;
-  @apply justify-center;
-  @apply overflow-hidden;
+  @apply fixed inset-0; /* Full screen container */
+  @apply flex items-center justify-center;
+  @apply bg-black bg-opacity-50; /* Optional: adds contrast */
 }
 
-/* Preview container - maintains aspect ratio and centers content */
+/* Preview container - sized to 60% of viewport with maximum width constraint */
 .preview-container {
-  @apply relative;
-  @apply w-full;
-  @apply max-w-[320px];  /* Matches PREVIEW_SIZE from CameraComponent */
-  @apply aspect-square;
-  @apply overflow-hidden;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
 }
 
-/* Video preview - perfectly centered and scaled */
+/* Video preview - base layer with mirroring effect */
 .video-preview {
-  @apply absolute;
-  @apply left-1/2;
-  @apply top-1/2;
-  @apply -translate-x-1/2;
-  @apply -translate-y-1/2;
-  @apply w-full;
-  @apply h-full;
-  @apply object-cover;
-  /* Mirror effect for selfie view */
-  @apply scale-x-[-1];
+  z-index: 1;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1); /* Mirror effect */
 }
 
-/* Overlay guide - centered and layered correctly */
-.overlay-guide {
-  @apply absolute;
-  @apply left-1/2;
-  @apply top-1/2;
-  @apply -translate-x-1/2;
-  @apply -translate-y-1/2;
-  @apply pointer-events-none;
-  @apply z-20;
-  /* Smooth transitions for any guide adjustments */
-  @apply transition-transform;
-  @apply duration-200;
-  @apply ease-out;
-}
-
-/* Photo frame - perfectly aligned with guide and preview */
+/* Photo frame - middle layer between video and guide */
 .photo-frame {
-  @apply absolute;
-  @apply left-1/2;
-  @apply top-1/2;
-  @apply -translate-x-1/2;
-  @apply -translate-y-1/2;
-  @apply pointer-events-none;
-  @apply z-10;
+  z-index: 2;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+/* Error container - centered error display with action button */
+.error-container {
+  @apply flex flex-col items-center justify-center;
+  @apply p-6 rounded-lg bg-white shadow-lg;
+  @apply space-y-4;
+}
+
+/* Loading container - centered loading state with spinner */
+.loading-container {
+  @apply absolute inset-0;
+  @apply flex flex-col items-center justify-center;
+  @apply bg-black bg-opacity-50;
+  @apply space-y-3;
+  z-index: 10;
+}
+
+/* Loading spinner animation */
+.loading-spinner {
+  @apply w-8 h-8;
+  @apply border-4 border-gray-300 border-t-blue-500;
+  @apply rounded-full;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Overlay guide - top layer for maximum visibility */
+.overlay-guide {
+  z-index: 3;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }

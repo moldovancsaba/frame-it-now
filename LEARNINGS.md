@@ -1,3 +1,79 @@
+## Camera System Implementation
+
+### Camera Preview and Capture Architecture
+1. Preview System:
+   - Implemented natural selfie preview using CSS transforms
+   - Optimized performance using hardware-accelerated transformations
+   - Maintained correct UI element orientation in mirrored view
+
+2. Capture System:
+   - Canvas-based capture with orientation handling
+   - Frame overlay composition in correct orientation
+   - Optimized image processing pipeline
+
+### Issues Encountered and Solutions
+
+1. Image Loading Issues:
+   ```
+   defaultLoader@
+   map@[native code]
+   generateImgAttrs@
+   getImgProps@
+   ```
+   - Root Cause: Next.js Image component configuration issues
+   - Solution: Added proper image domain configuration and unoptimized flag
+   - Prevention: Document image loader requirements in build config
+
+2. Type Definition Conflicts:
+   - Issue: Duplicate interface properties for width and height
+   - Solution: Consolidated interface properties and enhanced type definitions
+   - Impact: Improved type safety and code maintainability
+
+3. Component Architecture:
+   - Separated preview display from capture logic
+   - Implemented clean interface between components
+   - Enhanced error handling and recovery
+
+### Performance Considerations
+1. CSS Transform vs Canvas:
+   - CSS transforms are hardware-accelerated
+   - Canvas operations optimized for capture only
+   - Minimal memory and CPU impact
+
+### Technical Implementation Details
+1. Preview Mirroring:
+   ```typescript
+   style={{
+     transform: 'scaleX(-1)',
+     width: '100%',
+     height: '100%',
+     objectFit: 'cover'
+   }}
+   ```
+
+2. Capture Mirroring:
+   ```typescript
+   // Mirror and draw video frame
+   ctx.scale(-1, 1);
+   ctx.drawImage(video, sx, sy, side, side, -width, 0, width, height);
+   ctx.scale(-1, 1); // Reset transform
+   ```
+
+3. Frame Overlay:
+   ```typescript
+   // Add overlay after mirroring
+   if (overlayImage) {
+     ctx.drawImage(overlayImage, 0, 0, width, height);
+   }
+   ```
+
+### Best Practices Established
+1. Use CSS transforms for live preview
+2. Apply canvas transforms only during capture
+3. Maintain proper state management
+4. Implement comprehensive error handling
+5. Follow native camera app conventions
+
 ## Frontend
 
 ### TypeScript Migration
