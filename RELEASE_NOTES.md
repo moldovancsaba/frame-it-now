@@ -1,3 +1,25 @@
+## [v4.0.7] — 2025-07-15T16:53:13Z
+
+### Fixed
+- Critical UI layout and styling fixes
+  - Updated gradient background to correct colors and angle
+  - Fixed face guide visibility (now appears on top of camera preview)
+  - Improved button positioning in landscape mode
+  - Fixed z-index layering for all elements
+
+### Technical Details
+- Updated gradient colors to match design spec
+- Added proper z-index values for camera preview, face guide, and frame
+- Fixed landscape mode layout with proper margins
+- Improved element stacking and visibility
+
+### Developer Notes
+- Gradient background now uses correct colors and 315deg angle
+- Face guide is now visible on top of camera preview
+- Buttons properly positioned on right side in landscape mode
+- All z-index values properly organized for correct layering
+
+
 ## [v4.0.6] — 2025-07-15T16:47:35Z
 
 ### Fixed
