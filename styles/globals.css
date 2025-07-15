@@ -2,12 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Gradient background */
-.gradient-background {
-  background: #833AB4;
-  background: linear-gradient(90deg, rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 50%, rgba(252, 176, 69, 1) 100%);
-}
-
+/* Global styles */
 html, body {
   margin: 0;
   padding: 0;
@@ -17,19 +12,12 @@ html, body {
   background: linear-gradient(90deg, rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 50%, rgba(252, 176, 69, 1) 100%);
 }
 
-html {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-}
-
 #__next {
   width: 100%;
   min-height: 100vh;
   background: transparent;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-    Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Oxygen,
+    Ubuntu, Cantarell, \"Fira Sans\", \"Droid Sans\", \"Helvetica Neue\", sans-serif;
 }
 
 * {
@@ -37,61 +25,7 @@ html {
 }
 
 @layer components {
-  /* Dynamic preview sizing - utilities for JavaScript-controlled dimensions */
-  .preview-dynamic-size {
-    @apply w-full h-full;
-    @apply transition-[width,height] duration-200 ease-in-out;
-  }
-
-  /* Responsive preview container */
-  .preview-responsive-container {
-    @apply relative w-full max-w-[min(90vh,640px)] aspect-square;
-    @apply mx-auto box-border bg-transparent;
-  }
-
-  /* Video preview mirror effect */
-  .preview-mirror {
-    @apply absolute top-1/2 left-1/2;
-    @apply -translate-x-1/2 -translate-y-1/2 scale-x-[-1];
-    @apply w-full h-full object-contain;
-  }
-
-  /* Page layouts */
-  .page-container {
-    @apply min-h-screen text-white;
-    @apply flex flex-col justify-center;
-    background: transparent;
-  }
-
   /* Container layouts */
-  .camera-root {
-    @apply flex flex-col items-center justify-center min-h-screen;
-    @apply gap-[5%] p-[5%];
-  }
-
-  .preview-wrapper {
-    @apply relative w-full;
-    @apply max-w-[min(90vh,640px)];
-    @apply aspect-square mx-auto;
-    @apply box-border;
-  }
-
-  .video-element {
-    @apply absolute inset-0;
-    @apply w-full h-full;
-    @apply object-cover;
-    @apply rounded-lg;
-    transform: scaleX(-1);
-  }
-
-  .preview-wrapper .video-element {
-    @apply z-10;
-  }
-
-  .captured-photo {
-    @apply max-h-[90vh];
-    @apply w-full h-auto;
-  }
   .camera-container {
     @apply flex flex-col items-center justify-center min-h-screen w-full;
     @apply gap-4 p-[5%];
@@ -102,28 +36,21 @@ html {
     @apply relative overflow-hidden;
     @apply flex items-center justify-center;
     @apply w-full max-w-[min(90vh,640px)] aspect-square mx-auto;
-    @apply bg-transparent;
-  }
-
-  .video-preview {
-    @apply absolute inset-0;
-    @apply w-full h-full;
-    @apply object-contain;
-    transform: translate(-50%, -50%) scaleX(-1);
-    top: 50%;
-    left: 50%;
+    @apply bg-transparent rounded-lg;
   }
 
   .photo-container {
     @apply relative mx-auto;
-    @apply max-w-[640px] flex items-center justify-center;
+    @apply w-full max-w-[min(90vh,640px)] aspect-square;
+    @apply flex items-center justify-center;
   }
 
-  /* Landscape mode spacing for photo container */
-  @media (orientation: landscape) {
-    .photo-container {
-      margin-right: 140px; /* Account for button column width + spacing */
-    }
+  /* Video elements */
+  .video-preview {
+    @apply absolute inset-0;
+    @apply w-full h-full object-cover;
+    @apply rounded-lg;
+    transform: scaleX(-1);
   }
 
   .photo-frame {
@@ -132,58 +59,68 @@ html {
     @apply pointer-events-none;
   }
 
-  .button-container {
-    @apply flex w-full max-w-[640px];
-    @apply gap-3 my-4;
-    
-    /* Portrait mode (default) */
-    @apply flex-row flex-wrap justify-center;
+  .photo-output {
+    @apply w-full h-full object-contain rounded-lg;
   }
 
-  /* Landscape mode */
+  /* Button layouts */
+  .button-container {
+    @apply flex flex-row flex-wrap gap-3;
+    @apply justify-center items-center;
+    @apply w-full max-w-[640px] my-4;
+  }
+
   @media (orientation: landscape) {
     .button-container {
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      right: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      max-width: 120px;
+      @apply fixed right-8 top-1/2 -translate-y-1/2;
+      @apply flex-col max-w-[120px] m-0 p-0;
+      @apply z-50;
+    }
+
+    .photo-container {
+      @apply mr-[140px];
     }
   }
 
-  /* Button variants */
+  /* Button styles */
   .btn {
-    @apply rounded-lg px-5 py-2 w-full;
-    @apply font-semibold transition-all duration-200;
-    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
-  }
-  
-  /* Landscape mode adjustments */
-  @media (orientation: landscape) {
-    .btn {
-      margin-bottom: 0.5rem;
-    }
+    @apply rounded-lg px-5 py-3;
+    @apply font-semibold text-base;
+    @apply transition-all duration-200;
+    @apply focus:outline-none focus:ring-2;
+    @apply shadow-sm;
+    @apply flex items-center justify-center;
+    min-height: 44px;
+    min-width: 120px;
   }
 
   .btn-primary {
-    @apply bg-primary-500 text-white;
-    @apply hover:bg-primary-600 focus:ring-primary-500;
+    @apply bg-white text-gray-900;
+    @apply hover:bg-gray-100;
+    @apply focus:ring-gray-500 focus:ring-offset-2;
   }
 
   .btn-secondary {
-    @apply bg-primary-100 text-primary-700;
-    @apply hover:bg-primary-200 focus:ring-primary-500;
+    @apply bg-gray-800 text-white;
+    @apply hover:bg-gray-700;
+    @apply focus:ring-gray-500 focus:ring-offset-2;
   }
 
   .btn-outline {
-    @apply border-2 border-primary-500 text-primary-500;
-    @apply hover:bg-primary-50 focus:ring-primary-500;
+    @apply border-2 border-white text-white;
+    @apply hover:bg-white hover:text-gray-900;
+    @apply focus:ring-white focus:ring-offset-2;
   }
 
   .btn-disabled {
     @apply opacity-50 cursor-not-allowed;
+  }
+
+  /* Link button consistency */
+  .link-text {
+    @apply btn btn-primary;
+    @apply w-full text-center no-underline;
+    @apply hover:no-underline;
   }
 
   /* Loading states */
@@ -195,51 +132,14 @@ html {
 
   .loading-spinner {
     @apply inline-block w-6 h-6;
-    @apply border-4 border-primary-200 border-t-primary-500;
+    @apply border-4 border-white border-t-transparent;
     @apply rounded-full animate-spin;
-  }
-
-  /* Status indicators */
-  .status-text {
-    @apply m-2 text-primary-500;
-  }
-
-  .link-text {
-    @apply text-primary-500 mt-2;
-    @apply no-underline hover:underline;
-  }
-
-  /* Photo frame styles */
-  .photo-frame-overlay {
-    @apply absolute top-0 left-0 right-0 bottom-0;
-    @apply m-auto;
-    @apply opacity-80;
-    @apply transition-opacity duration-300;
-    @apply pointer-events-none rounded-lg;
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-  }
-
-  .photo-frame-hidden {
-    @apply opacity-0;
-  }
-
-  /* Photo output */
-  .photo-output {
-    @apply rounded-2xl;
-  }
-
-  /* Preview frame styles */
-  .preview-frame {
-    @apply w-full h-full;
   }
 
   /* Error states */
   .error-container {
     @apply p-5 m-5 rounded-lg;
-    @apply border border-red-400 bg-red-50 text-red-700;
+    @apply bg-red-100 border border-red-400 text-red-700;
   }
 }
 
@@ -249,3 +149,4 @@ html {
     transform: rotate(360deg);
   }
 }
+
