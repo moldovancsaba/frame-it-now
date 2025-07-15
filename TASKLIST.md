@@ -9,6 +9,7 @@
 
 ## Medium Priority
 - Implement camera settings persistence (Due: 2024-03-30T12:00:00.000Z)
+- Performance optimization research (Due: 2024-03-30T12:00:00.000Z)
 
 ## Completed Tasks
 - Implemented services directory structure (Completed: 2024-01-27T15:45:00.000Z)
@@ -18,8 +19,3 @@
 - Security vulnerability fixes (Completed: 2024-01-25T10:00:00.000Z)
 - Enhanced camera initialization implementation (Completed: 2024-01-26T10:00:00.000Z)
 - Improved error handling system (Completed: 2024-01-26T10:00:00.000Z)
-
-## Upcoming Tasks
-- Service layer unit testing (Due: 2024-02-10T12:00:00.000Z)
-- Integration testing for new services (Due: 2024-02-20T12:00:00.000Z)
-- Performance optimization research

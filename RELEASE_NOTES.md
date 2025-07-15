@@ -1,5 +1,13 @@
 # Release Notes
 
+## [3.0.0] - 2024-01-24T12:00:00.000Z
+
+### Removed
+- Slideshow feature and related components
+- Testing infrastructure and test files
+
+### Changed
+- Updated documentation to reflect removal of slideshow and testing infrastructure
 ## [v2.0.0] — 2025-07-15T13:41:30.000Z
 
 ### Added

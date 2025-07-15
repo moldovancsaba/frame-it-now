@@ -126,7 +126,7 @@ export const ErrorTooltip: React.FC<{error: CameraError}> = ({ error }) => {
       <span className="block text-sm mt-1">Error type: {error.type}</span>
       {error.retry && (
         <button
-          onClick={() => error.retry?.()}
+          onClick={() => { if (error.retry) void error.retry(); }}
           className="mt-2 text-red-700 underline hover:text-red-800"
         >
           Retry

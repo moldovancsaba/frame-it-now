@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 /**
  * Represents possible errors that can occur during camera operations
@@ -27,86 +27,97 @@ const initialCameraState: CameraState = {
 };
 
 /**
- * Hook for managing camera state and lifecycle
- * - Handles camera initialization
- * - Manages permissions
- * - Provides stream access
- * - Implements proper cleanup
+ * Result type for the useCamera hook
  */
-export const useCamera = (): {
+interface UseCameraResult {
   state: CameraState;
   retry: () => void;
-} => {
+}
+
+/**
+ * Hook for managing camera state and lifecycle
+ * Handles initialization, permissions, stream access, and cleanup
+ * @returns Object containing camera state and control functions
+ */
+export function useCamera(): UseCameraResult {
   const [state, setState] = useState<CameraState>(initialCameraState);
 
-  // Initialize camera on mount
-  useEffect(() => {
-    const initializeCamera = async (): Promise<void> => {
-      try {
-        setState(prev => ({ ...prev, initializationStatus: 'initializing' }));
-        
-        // Request camera access
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-          video: true 
-        });
-        
-        setState({
-          stream,
-          permissionState: 'granted',
-          initializationStatus: 'ready'
-        });
-      } catch (error: unknown) {
-        let cameraError: CameraError;
-        const err = error as { name?: string };
+  /**
+   * Initializes the camera stream and updates state
+   */
+  const initializeCamera = useCallback(async () => {
+    try {
+      setState(prev => ({ ...prev, initializationStatus: 'initializing' }));
+      
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: true 
+      });
+      
+      setState({
+        stream,
+        permissionState: 'granted',
+        initializationStatus: 'ready'
+      });
+    } catch (error: unknown) {
+      let cameraError: CameraError;
+      const err = error as { name?: string };
 
-        // Map browser errors to our error types
-        if (err.name === 'NotAllowedError') {
+      switch (err.name) {
+        case 'NotAllowedError':
           cameraError = {
             code: 'PERMISSION_DENIED',
             message: 'Camera access was denied by the user'
           };
-        } else if (err.name === 'NotFoundError') {
+          break;
+        case 'NotFoundError':
           cameraError = {
             code: 'DEVICE_NOT_FOUND',
             message: 'No camera device was found'
           };
-        } else if (err.name === 'NotSupportedError') {
+          break;
+        case 'NotSupportedError':
           cameraError = {
             code: 'NOT_SUPPORTED',
             message: 'Camera API is not supported in this browser'
           };
-        } else {
+          break;
+        default:
           cameraError = {
             code: 'INITIALIZATION_ERROR',
             message: 'Failed to initialize camera'
           };
-        }
-
-        setState({
-          error: cameraError,
-          permissionState: err.name === 'NotAllowedError' ? 'denied' : 'prompt',
-          initializationStatus: 'error'
-        });
       }
-    };
 
-    initializeCamera();
+      setState({
+        error: cameraError,
+        permissionState: err.name === 'NotAllowedError' ? 'denied' : 'prompt',
+        initializationStatus: 'error'
+      });
+    }
   }, []);
+
+  // Initialize camera on mount
+  useEffect(() => {
+    void initializeCamera();
+  }, [initializeCamera]);
 
   // Cleanup camera stream on unmount
   useEffect(() => {
-    return (): void => {
+    return () => {
       if (state.stream) {
         state.stream.getTracks().forEach(track => track.stop());
       }
     };
   }, [state.stream]);
 
+  // Retry initialization method
+  const retry = useCallback(() => {
+    setState(initialCameraState);
+    void initializeCamera();
+  }, [initializeCamera]);
+
   return {
     state,
-    // Expose a retry method for error recovery
-    retry: (): void => {
-      setState(initialCameraState);
-    }
+    retry
   };
-};
+}

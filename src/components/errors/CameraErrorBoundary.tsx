@@ -28,9 +28,10 @@ export class CameraErrorBoundary extends ErrorBoundary {
    */
   async handleCameraError(error: CameraError): Promise<void> {
     // Log the error using our error logging service
-    await errorLoggingService.logError({
+    // Log the error using our error logging service
+    void errorLoggingService.logError({
       timestamp: new Date().toISOString(),
-      type: error.type,
+      type: error.type.toString(),
       message: error.message,
       context: {
         component: this.constructor.name,
@@ -56,7 +57,7 @@ export class CameraErrorBoundary extends ErrorBoundary {
    */
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     if ('type' in error && Object.values(CameraErrorType).includes(error.type as CameraErrorType)) {
-      this.handleCameraError(error as CameraError);
+      void this.handleCameraError(error as CameraError);
     } else {
       // Fall back to base error handling for non-camera errors
       super.componentDidCatch(error, errorInfo);

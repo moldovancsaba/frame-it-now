@@ -10,9 +10,8 @@
 - [x] Implement error boundary handling with recovery
 - [ ] Add comprehensive JSDoc documentation
 - [ ] Enhance camera preview performance
-- [ ] Setup automated CI/CD pipeline
 
 ## Q2 2024
-- [ ] Implement advanced image processing features
-- [ ] Add camera settings customization
-- [ ] Enhance mobile device compatibility
+- [ ] Add camera settings customization and persistence
+- [ ] Optimize camera performance for mobile devices
+- [ ] Implement core image capture improvements

@@ -45,11 +45,10 @@ export default function CameraComponent({
   navigation = defaultNavigation,
 }: CameraComponentProps): JSX.Element {
   const [frameDimensions, setFrameDimensions] = useState({ width: 1080, height: 1080 }); // Default 1:1 aspect ratio
-  const { videoRef: videoRefRaw, initializationStatus: cameraStatus, startCamera } = useCamera({ 
+  const { videoRef, initializationStatus: cameraStatus, startCamera } = useCamera({ 
     facingMode: 'user',
     frameDimensions
   });
-  const videoRef = videoRefRaw as React.RefObject<HTMLVideoElement>;
   const frameRef = useRef<HTMLImageElement>(null);
   const [photo, setPhoto] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -162,9 +161,10 @@ const overlayUrl = (typeof window !== 'undefined' && typeof localStorage !== 'un
         throw new Error('Upload failed');
       }
 
-      const { url } = await response.json();
-      if (typeof url === 'string' && url.length > 0) {
-        setUploadedUrl(url);
+  interface UploadResponse { url: string }
+      const result = await response.json() as UploadResponse;
+      if (result.url && result.url.length > 0) {
+        setUploadedUrl(result.url);
       } else {
         setUploadedUrl(null);
       }
@@ -293,7 +293,7 @@ const overlayUrl = (typeof window !== 'undefined' && typeof localStorage !== 'un
       }}>
         {!photo && (
           <button 
-            onClick={handleCapture} 
+            onClick={() => void handleCapture()} 
             disabled={cameraStatus.state !== 'ready' || loading}
             className={`btn btn-primary ${cameraStatus.state !== 'ready' || loading ? 'btn-disabled' : ''}`}
           >
@@ -309,9 +309,9 @@ const overlayUrl = (typeof window !== 'undefined' && typeof localStorage !== 'un
         )}
         {photo && (
           <>
-            <button onClick={handleDownload} className="btn btn-primary">Download</button>
-            <button onClick={handleShare} className="btn btn-secondary">Share</button>
-            <button onClick={handleReset} className="btn btn-outline">New Photo</button>
+            <button onClick={() => void handleDownload()} className="btn btn-primary">Download</button>
+            <button onClick={() => void handleShare()} className="btn btn-secondary">Share</button>
+            <button onClick={() => void handleReset()} className="btn btn-outline">New Photo</button>
           </>
         )}
       </div>

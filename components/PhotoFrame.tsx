@@ -94,9 +94,10 @@ const PhotoFrame = forwardRef<HTMLImageElement, PhotoFrameProps>(function PhotoF
 
   // Update frame loaded state when dimensions are set
 
-  const imageStyle: CSSProperties = {
+const imageStyle: CSSProperties = {
     ...style,
-    ...(objectFit && { objectFit }),
+    objectFit: objectFit || 'cover',
+    maxHeight: '90vh',
     opacity: isReady ? 0.8 : 0,
     transition: 'opacity 0.3s ease',
     position: 'absolute',
@@ -114,7 +115,7 @@ const PhotoFrame = forwardRef<HTMLImageElement, PhotoFrameProps>(function PhotoF
       src={src}
       width={1080}
       height={1080}
-      className={className}
+      className={`video-preview ${className}`}
       style={imageStyle}
       alt="Photo frame overlay"
       onError={handleError}

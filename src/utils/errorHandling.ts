@@ -4,7 +4,7 @@ import { CameraErrorType, CameraError } from '../components/errors/CameraErrorBo
  * Interface for standardized error logging across the application
  */
 export interface ErrorLog {
-  timestamp: string; // ISO 8601
+  timestamp: string; // ISO 8601 with milliseconds precision
   type: string;
   message: string;
   context: object;
@@ -18,7 +18,10 @@ class ErrorLoggingService {
    * Logs an error with standardized format
    * @param error Error information to log
    */
-  public async logError(error: ErrorLog): Promise<void> {
+  public logError(error: ErrorLog): void {
+    // Ensuring ISO 8601 format with milliseconds precision
+    const timestamp = new Date().toISOString();
+    error.timestamp = timestamp;
     try {
       // Here we could integrate with external logging services
       console.error('Error logged:', {
