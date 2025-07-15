@@ -1,3 +1,25 @@
+## [v4.0.5] — 2025-07-15T16:43:41Z
+
+### Fixed
+- Critical UI fixes
+  - Restored gradient background
+  - All buttons now use identical design
+  - Buttons aligned in a single row: Download, Share, New Photo, View Online
+  - Fixed button layout inconsistencies
+
+### Technical Details
+- Restored original background gradient
+- Standardized button styles with consistent height and width
+- Aligned all buttons in a single horizontal row
+- Removed different button variants in favor of single consistent style
+
+### Developer Notes
+- All buttons now share the same base style
+- Button container maintains single-row layout
+- Removed unnecessary style variations
+- Simplified button markup and styling
+
+
 ## [v4.0.4] — 2025-07-15T16:38:23Z
 
 ### Fixed
