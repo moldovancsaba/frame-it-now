@@ -10,6 +10,7 @@
 
 ### 2. Technology Stack
 - TailwindCSS for utility-first styling
+- CSS Grid for button layout
 - CSS layers for proper style organization:
   ```css
   @tailwind base;
@@ -32,46 +33,45 @@ body {
 ```
 
 ### 4. Button Implementation
-- Fixed dimensions: 140px width, 44px height
-- White background with consistent styling
-- Centered text with no wrapping
-- Single row layout in portrait mode
-- Fixed right-side column in landscape mode
+#### Grid Layout
+- Portrait mode: Horizontal grid with auto-sized columns
+- Landscape mode: Vertical grid with auto-sized rows
+- Equal button distribution
+- No overflow in any screen size
 
 ```css
-/* Button base style */
+/* Portrait mode grid */
+.button-container {
+  @apply w-full max-w-[640px] mx-auto;
+  @apply grid grid-flow-col auto-cols-fr;
+  @apply gap-2;
+}
+
+/* Landscape mode grid */
+@media (orientation: landscape) {
+  .button-container {
+    @apply fixed right-6 top-1/2;
+    @apply grid grid-flow-row auto-rows-fr;
+    @apply m-0 p-0;
+    transform: translateY(-50%);
+    width: 140px;
+    z-index: 50;
+  }
+}
+```
+
+#### Button Styling
+```css
 .btn {
   @apply bg-white text-gray-900 rounded-lg;
   @apply font-semibold text-base;
   @apply hover:bg-gray-100 transition-all duration-200;
   @apply flex items-center justify-center;
-  width: 140px;
   height: 44px;
   padding: 0 1rem;
   white-space: nowrap;
-}
-
-/* Button container layout */
-.button-container {
-  @apply flex flex-row items-center justify-center;
-  @apply gap-4;
-  @apply w-full;
-  max-width: calc(4 * 140px + 3 * 1rem);
-}
-
-/* Landscape mode button positioning */
-@media (orientation: landscape) {
-  .button-container {
-    @apply fixed right-6 top-1/2;
-    @apply flex-col m-0 p-0;
-    transform: translateY(-50%);
-    width: 140px;
-    z-index: 50;
-  }
-
-  .camera-container {
-    padding-right: calc(140px + 2rem);
-  }
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 ```
 
@@ -109,7 +109,7 @@ Clear z-index hierarchy for proper element stacking:
 1. Use @layer for style organization
 2. Maintain single source of truth for styles
 3. Use Tailwind utilities when possible
-4. Define custom styles only when needed
+4. Use CSS Grid for button layout
 5. Keep consistent spacing and sizing
 6. Use relative units for responsiveness
 
@@ -121,13 +121,14 @@ Standard button order in interface:
 4. View Online
 
 ### 9. Responsive Design
-- Portrait: Buttons in single row at bottom
-- Landscape: Buttons in column on right side
+- Portrait: Grid flows horizontally with equal column widths
+- Landscape: Grid flows vertically with equal row heights
 - Container adjusts size and position based on buttons
 - Maintains consistent spacing and alignment
 
 ### 10. Performance Considerations
-- Use hardware acceleration for transforms
+- Use CSS Grid for optimal layout performance
+- Hardware acceleration for transforms
 - Minimize style recalculations
 - Optimize button container reflow
 - Proper will-change hints for animations
