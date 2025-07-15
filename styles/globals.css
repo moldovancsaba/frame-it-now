@@ -3,19 +3,24 @@
 @tailwind utilities;
 
 /* Global styles */
-html, body {
+body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
   width: 100%;
-  background: #2A7B9B;
   background: linear-gradient(315deg, rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 50%, rgba(237, 221, 83, 1) 100%);
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
 }
 
 #__next {
   width: 100%;
   min-height: 100vh;
-  background: transparent;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
 }
@@ -25,29 +30,31 @@ html, body {
 }
 
 @layer components {
-  /* Main container - calculates available space */
   .camera-container {
-    @apply flex flex-col items-center justify-center min-h-screen w-full;
-    padding: calc(5% + 44px); /* Base padding + button height */
+    @apply flex flex-col items-center justify-center;
+    @apply min-h-screen w-full;
+    @apply gap-4;
+    padding: 5%;
   }
 
-  /* Preview/Photo container positioning */
   .preview-container {
-    @apply relative overflow-hidden flex items-center justify-center;
-    @apply w-full aspect-square mx-auto;
+    @apply relative overflow-hidden;
+    @apply flex items-center justify-center;
+    @apply w-full max-w-[min(90vh,640px)] aspect-square mx-auto;
     @apply bg-transparent rounded-lg;
-    max-width: calc(min(90vh, 640px) - 120px); /* Reduce by button width */
   }
 
   .photo-container {
-    @apply relative mx-auto flex items-center justify-center;
-    @apply w-full aspect-square;
-    max-width: calc(min(90vh, 640px) - 120px); /* Reduce by button width */
+    @apply relative mx-auto;
+    @apply w-full max-w-[min(90vh,640px)] aspect-square;
+    @apply flex items-center justify-center;
   }
 
-  /* Video elements with proper z-index */
   .video-preview {
-    @apply absolute inset-0 w-full h-full object-cover rounded-lg block;
+    @apply absolute inset-0;
+    @apply w-full h-full;
+    @apply object-cover;
+    @apply rounded-lg block;
     transform: scaleX(-1);
     z-index: 10;
   }
@@ -57,51 +64,56 @@ html, body {
   }
 
   .overlay-guide {
-    @apply absolute inset-0 w-full h-full;
+    @apply absolute inset-0;
+    @apply w-full h-full;
     z-index: 20;
   }
 
   .photo-frame {
-    @apply absolute inset-0 w-full h-full opacity-80 pointer-events-none;
+    @apply absolute inset-0;
+    @apply w-full h-full;
+    @apply opacity-80;
+    @apply pointer-events-none;
     z-index: 30;
   }
 
   .photo-output {
-    @apply w-full h-full object-contain rounded-lg;
+    @apply w-full h-full;
+    @apply object-contain rounded-lg;
   }
 
-  /* Button layouts - using fixed width based on largest text */
+  /* Button layouts */
   .button-container {
     @apply flex flex-row items-center justify-center;
     @apply gap-4;
     @apply w-full;
-    max-width: calc(4 * 140px + 3 * 1rem); /* 4 buttons + 3 gaps */
+    max-width: calc(4 * 140px + 3 * 1rem);
   }
 
   @media (orientation: landscape) {
+    .camera-container {
+      padding-right: calc(140px + 2rem);
+    }
+
     .button-container {
       @apply fixed right-6 top-1/2;
       @apply flex-col m-0 p-0;
       transform: translateY(-50%);
-      width: 140px; /* Fixed width for all buttons */
+      width: 140px;
       z-index: 50;
-    }
-
-    .preview-container, .photo-container {
-      margin-right: calc(140px + 2rem); /* Button width + spacing */
     }
   }
 
-  /* Single button style - fixed dimensions */
+  /* Button style */
   .btn {
     @apply bg-white text-gray-900 rounded-lg;
     @apply font-semibold text-base;
     @apply hover:bg-gray-100 transition-all duration-200;
     @apply flex items-center justify-center;
-    width: 140px; /* Fixed width based on widest text */
-    height: 44px; /* Fixed height */
+    width: 140px;
+    height: 44px;
     padding: 0 1rem;
-    white-space: nowrap; /* Prevent text wrap */
+    white-space: nowrap;
   }
 
   .btn-disabled {
@@ -110,7 +122,8 @@ html, body {
 
   /* Loading states */
   .loading-container {
-    @apply absolute inset-0 z-50 flex flex-col items-center justify-center gap-3;
+    @apply absolute inset-0 z-50;
+    @apply flex flex-col items-center justify-center gap-3;
     @apply bg-black bg-opacity-50;
   }
 
