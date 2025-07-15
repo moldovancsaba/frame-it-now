@@ -1,3 +1,25 @@
+## [v4.0.18] — 2025-07-15T17:29:27Z
+
+### Fixed
+- Button layout improvements
+  - Switched to flex-wrap for automatic wrapping
+  - Removed text overflow and ellipsis
+  - Full text always visible
+  - Added proper button spacing
+
+### Technical Details
+- Portrait mode: flex with wrap for multiple rows
+- Landscape mode: flex-col with no-wrap
+- min-width: 140px on buttons
+- Increased container width to 160px in landscape
+
+### Developer Notes
+- Buttons wrap to new row when needed
+- No text cropping or overflow
+- Clean layout in all screen sizes
+- Proper spacing between wrapped rows
+
+
 ## [v4.0.17] — 2025-07-15T17:26:07Z
 
 ### Fixed
