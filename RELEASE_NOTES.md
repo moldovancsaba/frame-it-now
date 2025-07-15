@@ -1,3 +1,23 @@
+## [v4.0.15] — 2025-07-15T17:20:19Z
+
+### Fixed
+- Removed competing inline background color
+  - Deleted background settings from index.tsx
+  - Ensured gradient is only defined in globals.css
+  - Unified background color definition
+
+### Technical Details
+- Removed background: #19191b from index.tsx
+- Gradient now defined only in globals.css
+- Verified consistent background application
+
+### Developer Notes
+- Cleaned up background color settings
+- No more competing background definitions
+- Ensured consistent visual appearance
+- Verified gradient shows across all pages
+
+
 ## [v4.0.14] — 2025-07-15T17:17:40Z
 
 ### Fixed
