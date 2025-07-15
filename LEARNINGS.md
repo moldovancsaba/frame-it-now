@@ -1,4 +1,119 @@
+## CSS and TailwindCSS Implementation
+
+### TailwindCSS Media Query Constraints - 2025-07-15T16:29:16Z
+
+#### Challenge
+Implementing responsive styles with TailwindCSS while maintaining build compatibility and code maintainability.
+
+#### Key Learnings
+1. TailwindCSS Limitations:
+   - @apply directive cannot be used within @media queries
+   - Media queries must be structured at the root level
+   - Regular CSS properties should be used within media queries
+
+2. Best Practices:
+   - Keep media queries at the root level
+   - Use regular CSS properties for media query styles
+   - Maintain clear separation between base and responsive styles
+   - Consider moving complex responsive styles to separate classes
+
+3. Example Implementation:
+   ```css
+   /* Base styles using @apply */
+   .my-component {
+     @apply flex items-center justify-center;
+   }
+
+   /* Responsive styles using regular CSS */
+   @media (orientation: landscape) {
+     .my-component {
+       flex-direction: column;
+       margin-right: 2rem;
+     }
+   }
+   ```
+
+#### Impact
+- Improved build reliability
+- Better CSS maintainability
+- Cleaner responsive design implementation
+- Enhanced code readability
+
+## Visual Design Implementation
+
+### Gradient Background and Transparency Testing - 2025-07-15T15:50:08Z
+
+#### Test Results
+1. Gradient Backgrounds
+   - ✅ Consistent display across all views
+   - ✅ Smooth color transitions
+   - ✅ Proper rendering on different screen sizes
+   - ✅ No color banding or artifacts
+
+2. Transparency Effects
+   - ✅ Correct alpha channel rendering
+   - ✅ Proper layering with background elements
+   - ✅ Consistent across different browsers
+   - ✅ No unintended opacity issues
+
+3. Background Validation
+   - ✅ No unexpected gray backgrounds
+   - ✅ Clean transitions between sections
+   - ✅ Proper z-index handling
+   - ✅ Consistent visual hierarchy
+
+#### Best Practices Identified
+1. Always validate gradients across different viewport sizes
+2. Test transparency with various background combinations
+3. Verify background colors in all major browsers
+4. Check for unintended color bleeding or artifacts
+
 ## Camera System Implementation
+
+### Responsive Preview Layout Implementation - 2025-07-15T15:09:11.000Z
+
+#### Challenge
+Implementing a consistent, overflow-free camera preview that maintains proper scaling and alignment across different screen sizes while preserving the mirror effect.
+
+#### Solution
+1. Container Structure:
+   ```jsx
+   <div className="preview-container" style={{ 
+     position: 'relative',
+     width: '100%',
+     maxWidth: 'min(90vh, 640px)',
+     aspectRatio: '1',
+     margin: '0 auto',
+     boxSizing: 'border-box'
+   }}>
+   ```
+
+2. Video Element Positioning:
+   ```jsx
+   <video
+     style={{
+       position: 'absolute',
+       top: '50%',
+       left: '50%',
+       transform: 'translate(-50%, -50%) scaleX(-1)',
+       width: '100%',
+       height: '100%',
+       objectFit: 'contain'
+     }}
+   />
+   ```
+
+#### Key Learnings
+1. Use `object-fit: contain` instead of `cover` to prevent overflow while maintaining aspect ratio
+2. Combine transform properties for both centering and mirroring
+3. Use relative container with absolute positioning for precise control
+4. Implement responsive sizing using viewport units and min function
+
+#### Best Practices
+1. Always use box-sizing: border-box for predictable layouts
+2. Combine multiple transforms in a single property for better performance
+3. Use viewport-relative units for responsive scaling
+4. Maintain aspect ratio using modern CSS properties
 
 ### Camera Preview and Capture Architecture
 1. Preview System:

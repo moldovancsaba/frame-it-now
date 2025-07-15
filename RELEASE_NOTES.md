@@ -1,5 +1,66 @@
 # Release Notes
 
+## [v4.0.1] — 2025-07-15T16:29:16Z
+
+### Fixed
+- Build failure due to @apply directives in media queries
+  - Restructured CSS to avoid using @apply within @media rules
+  - Maintained visual consistency while fixing the build issue
+  - Improved CSS maintainability by following TailwindCSS best practices
+
+### Technical Details
+- Fixed CSS compatibility issues with TailwindCSS
+- Removed legacy CSS files in favor of TailwindCSS
+- Enhanced CSS structure for better maintainability
+- Verified build success after CSS fixes
+
+### Developer Notes
+- TailwindCSS does not support @apply within @media queries
+- CSS changes maintain identical visual output
+- Build now completes successfully
+
+## [v4.0.0] — 2025-07-15T15:50:08Z
+
+### Changed
+- Major visual update: gradient background and transparency implementation
+  - Verified correct gradient background display throughout the application
+  - Confirmed proper transparency rendering across all components
+  - Validated absence of unintended gray backgrounds
+  - Enhanced overall visual consistency
+
+### Technical Details
+- Comprehensive manual testing performed across all views
+- Verified visual consistency in development environment
+- Confirmed proper CSS gradient and transparency implementations
+- Validated background rendering across different screen sizes
+
+### Developer Notes
+- All gradient backgrounds display as intended
+- Transparency effects work correctly
+- No unintended gray backgrounds present
+- Visual implementation meets design specifications
+
+## [v3.1.0] — 2025-07-15T15:09:11.000Z
+
+### Changed
+- Improved camera preview and frame alignment
+  - Fixed video preview overflow issues
+  - Implemented consistent frame scaling across all screen sizes
+  - Enhanced responsive layout for preview and result views
+  - Unified styling between camera preview and result display
+
+### Technical Details
+- Updated video element positioning using `transform: translate(-50%, -50%) scaleX(-1)`
+- Changed `objectFit` from `cover` to `contain` to prevent overflow
+- Maintained aspect ratio consistency across all views
+- Enhanced container styling for better responsiveness
+
+### Developer Notes
+- Preview now properly contained within frame boundaries
+- Consistent scaling behavior across different screen sizes
+- Improved layout stability during orientation changes
+- Enhanced user experience with properly aligned content
+
 ## [3.0.0] - 2024-01-24T12:00:00.000Z
 
 ### Removed
