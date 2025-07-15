@@ -8,8 +8,8 @@ html, body {
   padding: 0;
   min-height: 100vh;
   width: 100%;
-  background: #833AB4;
-  background: linear-gradient(90deg, rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 50%, rgba(252, 176, 69, 1) 100%);
+  background: #2A7B9B;
+  background: linear-gradient(315deg, rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 50%, rgba(237, 221, 83, 1) 100%);
 }
 
 #__next {
@@ -44,14 +44,21 @@ html, body {
   .video-preview {
     @apply absolute inset-0 w-full h-full object-cover rounded-lg block;
     transform: scaleX(-1);
+    z-index: 10;
   }
 
   .video-preview-hidden {
     @apply hidden;
   }
 
+  .overlay-guide {
+    @apply absolute inset-0 w-full h-full;
+    z-index: 20;
+  }
+
   .photo-frame {
     @apply absolute inset-0 w-full h-full opacity-80 pointer-events-none;
+    z-index: 30;
   }
 
   .photo-output {
@@ -62,6 +69,24 @@ html, body {
   .button-container {
     @apply flex flex-row items-center justify-center gap-2;
     @apply w-full max-w-[640px];
+  }
+
+  @media (orientation: landscape) {
+    .button-container {
+      @apply fixed right-6 top-1/2;
+      @apply flex-col m-0 p-0;
+      transform: translateY(-50%);
+      max-width: 120px;
+      z-index: 50;
+    }
+
+    .photo-container {
+      @apply mr-32;
+    }
+
+    .preview-container {
+      @apply mr-32;
+    }
   }
 
   /* Single button style for all buttons */
@@ -80,7 +105,7 @@ html, body {
 
   /* Loading states */
   .loading-container {
-    @apply absolute inset-0 z-10 flex flex-col items-center justify-center gap-3;
+    @apply absolute inset-0 z-50 flex flex-col items-center justify-center gap-3;
     @apply bg-black bg-opacity-50;
   }
 
