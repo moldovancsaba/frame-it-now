@@ -88,22 +88,27 @@
   /* Button layouts */
   .button-container {
     @apply w-full max-w-[640px] mx-auto;
-    @apply grid grid-flow-col auto-cols-fr;
-    @apply gap-2;
+    @apply flex flex-wrap justify-center items-center;
+    @apply gap-4;
+    padding: 0.5rem;
   }
 
   @media (orientation: landscape) {
     .camera-container {
-      padding-right: calc(140px + 2rem);
+      padding-right: calc(160px + 2rem);
     }
 
     .button-container {
       @apply fixed right-6 top-1/2;
-      @apply grid grid-flow-row auto-rows-fr;
-      @apply m-0 p-0;
+      @apply flex flex-col flex-nowrap;
+      @apply m-0 p-2;
       transform: translateY(-50%);
-      width: 140px;
+      width: 160px;
       z-index: 50;
+    }
+
+    .btn {
+      @apply w-full;
     }
   }
 
@@ -113,11 +118,10 @@
     @apply font-semibold text-base;
     @apply hover:bg-gray-100 transition-all duration-200;
     @apply flex items-center justify-center;
+    min-width: 140px;
     height: 44px;
     padding: 0 1rem;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   .btn-disabled {
