@@ -1,3 +1,25 @@
+## [v4.0.4] — 2025-07-15T16:38:23Z
+
+### Fixed
+- UI consistency improvements
+  - Fixed button container positioning in landscape mode
+  - Standardized button styling across all actions
+  - Made \"View Online\" link consistent with other buttons
+  - Ensured capture photo size matches preview size
+
+### Technical Details
+- Updated button container CSS to properly position outside content area
+- Standardized button styles with consistent height and padding
+- Fixed landscape mode layout issues
+- Made photo dimensions consistent between preview and capture
+
+### Developer Notes
+- Button container no longer overlaps with content in landscape mode
+- All buttons now have consistent styling and dimensions
+- Photo capture size now matches preview size (1080x1080)
+- Link buttons share the same styling as regular buttons
+
+
 
 ## [v4.0.3] — 2025-07-15T16:34:32Z
 
