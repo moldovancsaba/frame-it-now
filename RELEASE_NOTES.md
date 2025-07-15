@@ -1,3 +1,25 @@
+
+## [v4.0.3] — 2025-07-15T16:34:32Z
+
+### Fixed
+- Improved frame centering and UI consistency
+  - Enhanced frame positioning for better visual alignment
+  - Refined button styling for clearer interaction
+  - Optimized responsive layout behavior
+  - Improved overall visual hierarchy
+
+### Technical Details
+- Updated PhotoFrame component styling for precise centering
+- Enhanced button styles with clearer hover and focus states
+- Improved responsive layout handling
+- Optimized visual feedback for user interactions
+
+### Developer Notes
+- Frame positioning now maintains consistency across screen sizes
+- Button interactions provide clear visual feedback
+- Layout remains stable during orientation changes
+- Enhanced component reusability through consistent styling
+
 # Release Notes
 
 ## [v4.0.2] — 2025-07-15T16:31:28Z
