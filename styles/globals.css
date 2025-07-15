@@ -2,13 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global styles */
+/* Gradient background */
 html, body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
   width: 100%;
-  background: #833AB4;
   background: linear-gradient(90deg, rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 50%, rgba(252, 176, 69, 1) 100%);
 }
 
@@ -16,8 +15,8 @@ html, body {
   width: 100%;
   min-height: 100vh;
   background: transparent;
-  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Oxygen,
-    Ubuntu, Cantarell, \"Fira Sans\", \"Droid Sans\", \"Helvetica Neue\", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
 }
 
 * {
@@ -25,7 +24,6 @@ html, body {
 }
 
 @layer components {
-  /* Container layouts */
   .camera-container {
     @apply flex flex-col items-center justify-center min-h-screen w-full;
     @apply gap-4 p-[5%];
@@ -45,7 +43,6 @@ html, body {
     @apply flex items-center justify-center;
   }
 
-  /* Video elements */
   .video-preview {
     @apply absolute inset-0;
     @apply w-full h-full object-cover;
@@ -65,62 +62,32 @@ html, body {
 
   /* Button layouts */
   .button-container {
-    @apply flex flex-row flex-wrap gap-3;
-    @apply justify-center items-center;
-    @apply w-full max-w-[640px] my-4;
+    @apply flex flex-row items-center justify-center;
+    @apply w-full max-w-[640px];
+    @apply gap-2;
   }
 
-  @media (orientation: landscape) {
-    .button-container {
-      @apply fixed right-8 top-1/2 -translate-y-1/2;
-      @apply flex-col max-w-[120px] m-0 p-0;
-      @apply z-50;
-    }
-
-    .photo-container {
-      @apply mr-[140px];
-    }
-  }
-
-  /* Button styles */
+  /* Single button style for all buttons */
   .btn {
-    @apply rounded-lg px-5 py-3;
-    @apply font-semibold text-base;
-    @apply transition-all duration-200;
-    @apply focus:outline-none focus:ring-2;
-    @apply shadow-sm;
-    @apply flex items-center justify-center;
-    min-height: 44px;
-    min-width: 120px;
-  }
-
-  .btn-primary {
     @apply bg-white text-gray-900;
+    @apply rounded-lg px-4 py-2;
+    @apply font-semibold;
     @apply hover:bg-gray-100;
-    @apply focus:ring-gray-500 focus:ring-offset-2;
+    @apply transition-all duration-200;
+    @apply text-center;
+    min-width: 100px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .btn-secondary {
-    @apply bg-gray-800 text-white;
-    @apply hover:bg-gray-700;
-    @apply focus:ring-gray-500 focus:ring-offset-2;
-  }
-
-  .btn-outline {
-    @apply border-2 border-white text-white;
-    @apply hover:bg-white hover:text-gray-900;
-    @apply focus:ring-white focus:ring-offset-2;
+  .btn-primary, .btn-secondary, .btn-outline, .link-text {
+    @apply btn;
   }
 
   .btn-disabled {
     @apply opacity-50 cursor-not-allowed;
-  }
-
-  /* Link button consistency */
-  .link-text {
-    @apply btn btn-primary;
-    @apply w-full text-center no-underline;
-    @apply hover:no-underline;
   }
 
   /* Loading states */
@@ -149,4 +116,3 @@ html, body {
     transform: rotate(360deg);
   }
 }
-

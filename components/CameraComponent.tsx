@@ -233,11 +233,29 @@ export default function CameraComponent({
         )}
 
         <div className="button-container">
+          {photo && (
+            <>
+              <button onClick={() => void handleDownload()} className="btn">Download</button>
+              <button onClick={() => void handleShare()} className="btn">Share</button>
+              <button onClick={() => void handleReset()} className="btn">New Photo</button>
+              {uploadedUrl && (
+                <a 
+                  href={uploadedUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="link-text"
+                >
+                  View Online
+                </a>
+              )}
+            </>
+          )}
+
           {!photo && (
             <button 
               onClick={() => void handleCapture()} 
               disabled={cameraStatus.state !== 'ready' || loading}
-              className={`btn btn-primary ${cameraStatus.state !== 'ready' || loading ? 'btn-disabled' : ''}`}
+              className={`btn ${cameraStatus.state !== 'ready' || loading ? 'btn-disabled' : ''}`}
             >
               {loading ? (
                 <>
@@ -248,13 +266,6 @@ export default function CameraComponent({
                 'Take Photo'
               )}
             </button>
-          )}
-          {photo && (
-            <>
-              <button onClick={() => void handleDownload()} className="btn btn-primary">Download</button>
-              <button onClick={() => void handleShare()} className="btn btn-secondary">Share</button>
-              <button onClick={() => void handleReset()} className="btn btn-outline">New Photo</button>
-            </>
           )}
         </div>
 
