@@ -1,3 +1,22 @@
+## [v4.0.11] — 2025-07-15T17:09:52Z
+
+### Fixed
+- Fixed background gradient issue
+  - Applied gradient to both html and body elements
+  - Ensured full viewport coverage
+  - No more gray background showing
+
+### Technical Details
+- Added gradient background to html element
+- Maintained gradient on body element
+- Verified full coverage across viewport sizes
+
+### Developer Notes
+- Background now shows correctly on all screen sizes
+- No gaps or gray areas visible
+- Gradient maintains correct angle and colors
+
+
 ## [v4.0.10] — 2025-07-15T17:06:23Z
 
 ### Fixed
