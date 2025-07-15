@@ -25,22 +25,27 @@ html, body {
 }
 
 @layer components {
+  /* Main container - calculates available space */
   .camera-container {
-    @apply flex flex-col items-center justify-center min-h-screen w-full gap-4 p-[5%];
-    background: transparent;
+    @apply flex flex-col items-center justify-center min-h-screen w-full;
+    padding: calc(5% + 44px); /* Base padding + button height */
   }
 
+  /* Preview/Photo container positioning */
   .preview-container {
     @apply relative overflow-hidden flex items-center justify-center;
-    @apply w-full max-w-[min(90vh,640px)] aspect-square mx-auto;
+    @apply w-full aspect-square mx-auto;
     @apply bg-transparent rounded-lg;
+    max-width: calc(min(90vh, 640px) - 120px); /* Reduce by button width */
   }
 
   .photo-container {
     @apply relative mx-auto flex items-center justify-center;
-    @apply w-full max-w-[min(90vh,640px)] aspect-square;
+    @apply w-full aspect-square;
+    max-width: calc(min(90vh, 640px) - 120px); /* Reduce by button width */
   }
 
+  /* Video elements with proper z-index */
   .video-preview {
     @apply absolute inset-0 w-full h-full object-cover rounded-lg block;
     transform: scaleX(-1);
@@ -65,10 +70,12 @@ html, body {
     @apply w-full h-full object-contain rounded-lg;
   }
 
-  /* Button layouts */
+  /* Button layouts - using fixed width based on largest text */
   .button-container {
-    @apply flex flex-row items-center justify-center gap-2;
-    @apply w-full max-w-[640px];
+    @apply flex flex-row items-center justify-center;
+    @apply gap-4;
+    @apply w-full;
+    max-width: calc(4 * 140px + 3 * 1rem); /* 4 buttons + 3 gaps */
   }
 
   @media (orientation: landscape) {
@@ -76,27 +83,25 @@ html, body {
       @apply fixed right-6 top-1/2;
       @apply flex-col m-0 p-0;
       transform: translateY(-50%);
-      max-width: 120px;
+      width: 140px; /* Fixed width for all buttons */
       z-index: 50;
     }
 
-    .photo-container {
-      @apply mr-32;
-    }
-
-    .preview-container {
-      @apply mr-32;
+    .preview-container, .photo-container {
+      margin-right: calc(140px + 2rem); /* Button width + spacing */
     }
   }
 
-  /* Single button style for all buttons */
+  /* Single button style - fixed dimensions */
   .btn {
-    @apply bg-white text-gray-900 rounded-lg px-4 py-2;
-    @apply font-semibold text-base text-center;
+    @apply bg-white text-gray-900 rounded-lg;
+    @apply font-semibold text-base;
     @apply hover:bg-gray-100 transition-all duration-200;
     @apply flex items-center justify-center;
-    min-width: 100px;
-    height: 40px;
+    width: 140px; /* Fixed width based on widest text */
+    height: 44px; /* Fixed height */
+    padding: 0 1rem;
+    white-space: nowrap; /* Prevent text wrap */
   }
 
   .btn-disabled {
