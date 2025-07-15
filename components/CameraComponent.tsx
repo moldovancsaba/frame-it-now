@@ -4,7 +4,7 @@ import PhotoFrame from './PhotoFrame';
 import useCamera from '../hooks/useCamera';
 import { defaultNavigation, Navigation } from '../utils/navigation';
 import { capturePhoto, loadImage } from '../utils/photoCapture';
-import { getAvailableScreenSpace, calculateUIPositions } from '../utils/previewSize';
+import { getAvailableScreenSpace } from '../utils/previewSize';
 import OverlayGuide from './OverlayGuide';
 import ErrorBoundary from './ErrorBoundary';
 
@@ -204,14 +204,21 @@ const overlayUrl = (typeof window !== 'undefined' && typeof localStorage !== 'un
         </div>
       )}
     >
-    <div className="camera-container" data-testid="camera-container">
-  {!photo ? (
-<div className="preview-container" style={{ 
-            position: 'relative', 
-            width: previewSize.width || '100%',
-            height: previewSize.height || '100%',
-            maxWidth: '100vw',
-            maxHeight: '100vh',
+    <div className="camera-container" style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        gap: '5%',
+        padding: '5%'
+      }} data-testid="camera-container">
+        {!photo ? (
+          <div className="preview-container" style={{ 
+            position: 'relative',
+            width: '100%',
+            maxWidth: '640px',
+            aspectRatio: '1',
             margin: '0 auto'
           }}>
           {cameraStatus.state === 'initializing' && (
@@ -237,11 +244,15 @@ const overlayUrl = (typeof window !== 'undefined' && typeof localStorage !== 'un
                   }
                 }}
                 style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
                   width: '100%',
                   height: '100%',
                   objectFit: 'cover',
                   transform: 'scaleX(-1)',
-                  display: cameraStatus.state === 'ready' ? 'block' : 'none'
+                  display: cameraStatus.state === 'ready' ? 'block' : 'none',
+                  borderRadius: '8px'
                 }}
               />
               <OverlayGuide 
@@ -259,21 +270,27 @@ const overlayUrl = (typeof window !== 'undefined' && typeof localStorage !== 'un
             </>
           )}
         </div>
-      ) : (
-        <div className="photo-container" data-testid="photo-container">
-          <Image
-            src={photo}
-            alt="captured photo"
-            width={320}
-            height={320}
-            className="photo-output"
-            unoptimized
-            priority
-          />
-        </div>
-      )}
+        ) : (
+          <div className="photo-container" data-testid="photo-container">
+            <Image
+              src={photo}
+              alt="captured photo"
+              width={320}
+              height={320}
+              className="photo-output"
+              unoptimized
+              priority
+            />
+          </div>
+        )}
 
-      <div className="button-container" style={calculateUIPositions(previewSize).buttons}>
+      <div className="button-container" style={{
+        display: 'flex',
+        justifyContent: 'center',
+        gap: '5%',
+        width: '100%',
+        maxWidth: '640px'
+      }}>
         {!photo && (
           <button 
             onClick={handleCapture} 
