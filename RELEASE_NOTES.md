@@ -1,3 +1,25 @@
+## [v4.0.8] — 2025-07-15T16:58:53Z
+
+### Fixed
+- Layout and sizing improvements
+  - Standardized button sizes based on widest text ("New Photo")
+  - Fixed button width to 140px and height to 44px
+  - Prevented button text wrapping
+  - Optimized container positioning based on button space
+
+### Technical Details
+- Calculated preview/photo container size accounting for button space
+- Set fixed button dimensions (140px × 44px)
+- Added white-space: nowrap to prevent text wrapping
+- Improved spacing calculations in both portrait and landscape modes
+
+### Developer Notes
+- All buttons now have consistent size regardless of text length
+- Container size automatically adjusts based on button placement
+- Fixed width ensures uniform button appearance across all states
+- Improved spacing and alignment calculations
+
+
 ## [v4.0.7] — 2025-07-15T16:53:13Z
 
 ### Fixed
