@@ -1,3 +1,23 @@
+## [v4.0.12] — 2025-07-15T17:12:39Z
+
+### Fixed
+- Background gradient cleanup
+  - Removed duplicate gradient declarations
+  - Set gradient only once on html element
+  - Removed unnecessary background-color declarations
+  - Removed transparent backgrounds
+
+### Technical Details
+- Consolidated gradient styling to single location
+- Removed background declarations from body and container elements
+- Simplified background implementation
+
+### Developer Notes
+- Background gradient now properly covers entire viewport
+- No competing background declarations
+- Clean, single-source gradient implementation
+
+
 ## [v4.0.11] — 2025-07-15T17:09:52Z
 
 ### Fixed
