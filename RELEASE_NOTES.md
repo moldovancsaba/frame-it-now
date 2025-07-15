@@ -1,3 +1,25 @@
+## [v4.0.17] — 2025-07-15T17:26:07Z
+
+### Fixed
+- Button layout improvements
+  - Switched to CSS Grid for button container
+  - Added auto-sizing columns for equal distribution
+  - Prevented button text overflow
+  - Added responsive grid flow direction
+
+### Technical Details
+- Portrait mode: grid-flow-col with auto-cols-fr
+- Landscape mode: grid-flow-row with auto-rows-fr
+- Added text-overflow: ellipsis for long button text
+- Removed fixed button width in favor of grid
+
+### Developer Notes
+- Buttons now automatically fill available space
+- No horizontal overflow in any screen size
+- Equal button distribution in container
+- Maintains consistent height and spacing
+
+
 ## [v4.0.16] — 2025-07-15T17:23:18Z
 
 ### Added
