@@ -10,7 +10,7 @@
 
 ### 2. Technology Stack
 - TailwindCSS for utility-first styling
-- CSS Grid for button layout
+- Flexbox for button layout with wrapping
 - CSS layers for proper style organization:
   ```css
   @tailwind base;
@@ -33,28 +33,29 @@ body {
 ```
 
 ### 4. Button Implementation
-#### Grid Layout
-- Portrait mode: Horizontal grid with auto-sized columns
-- Landscape mode: Vertical grid with auto-sized rows
-- Equal button distribution
-- No overflow in any screen size
+#### Flex Layout
+- Portrait mode: Wrap to new rows when needed
+- Landscape mode: Single column, no wrap
+- No text overflow or cropping allowed
+- Consistent button sizing
 
 ```css
-/* Portrait mode grid */
+/* Portrait mode flex */
 .button-container {
   @apply w-full max-w-[640px] mx-auto;
-  @apply grid grid-flow-col auto-cols-fr;
-  @apply gap-2;
+  @apply flex flex-wrap justify-center items-center;
+  @apply gap-4;
+  padding: 0.5rem;
 }
 
-/* Landscape mode grid */
+/* Landscape mode flex */
 @media (orientation: landscape) {
   .button-container {
     @apply fixed right-6 top-1/2;
-    @apply grid grid-flow-row auto-rows-fr;
-    @apply m-0 p-0;
+    @apply flex flex-col flex-nowrap;
+    @apply m-0 p-2;
     transform: translateY(-50%);
-    width: 140px;
+    width: 160px;
     z-index: 50;
   }
 }
@@ -67,11 +68,10 @@ body {
   @apply font-semibold text-base;
   @apply hover:bg-gray-100 transition-all duration-200;
   @apply flex items-center justify-center;
+  min-width: 140px;
   height: 44px;
   padding: 0 1rem;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 ```
 
@@ -109,27 +109,37 @@ Clear z-index hierarchy for proper element stacking:
 1. Use @layer for style organization
 2. Maintain single source of truth for styles
 3. Use Tailwind utilities when possible
-4. Use CSS Grid for button layout
+4. Let buttons wrap naturally on overflow
 5. Keep consistent spacing and sizing
 6. Use relative units for responsiveness
 
-### 8. Button Order
-Standard button order in interface:
-1. Download
-2. Share
-3. New Photo
-4. View Online
+### 8. Button Rules
+1. Standard button order:
+   - Download
+   - Share
+   - New Photo
+   - View Online
+2. Button sizing:
+   - Minimum width: 140px
+   - Fixed height: 44px
+   - Full text visibility required
+3. Button wrapping:
+   - Portrait: Wrap to new rows when needed
+   - Landscape: Single column, no wrap
+4. Button spacing:
+   - Gap between buttons: 1rem (16px)
+   - Container padding: 0.5rem (8px)
 
 ### 9. Responsive Design
-- Portrait: Grid flows horizontally with equal column widths
-- Landscape: Grid flows vertically with equal row heights
-- Container adjusts size and position based on buttons
+- Portrait: Buttons wrap to new rows if needed
+- Landscape: Fixed width column on right side
+- Container adjusts for button position
 - Maintains consistent spacing and alignment
 
 ### 10. Performance Considerations
-- Use CSS Grid for optimal layout performance
+- Use Flexbox for optimal layout performance
 - Hardware acceleration for transforms
 - Minimize style recalculations
-- Optimize button container reflow
+- Efficient button wrapping
 - Proper will-change hints for animations
 
