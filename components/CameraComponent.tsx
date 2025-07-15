@@ -8,35 +8,15 @@ import { getAvailableScreenSpace } from '../utils/previewSize';
 import OverlayGuide from './OverlayGuide';
 import ErrorBoundary from './ErrorBoundary';
 
-/**
- * Props interface for the CameraComponent
- * @interface CameraComponentProps
- */
 interface CameraComponentProps {
-  /** Default overlay image URL to use for photo frames */
   defaultOverlay?: string;
-  /** Callback function triggered after successful photo capture */
   onPhotoCapture?: (photoUrl: string) => void;
-  /** Callback function for handling errors during camera operations */
   onError?: (error: Error) => void;
-  /** Navigation service */
   navigation?: Navigation;
 }
 
 const DEFAULT_OVERLAY = 'https://i.ibb.co/MDzTJdB8/SEYU-FRAME-1080x1080.png';
-
-// Replace fixed size with dynamic frame dimensions
-/**
- * Calculates natural dimensions of a given HTML image element
- * @param frame - The HTML image element to get dimensions from
- * @returns Object containing width and height in pixels
- */
-const getFrameDimensions = (frame: HTMLImageElement): { width: number; height: number } => {
-  return {
-    width: frame.naturalWidth,
-    height: frame.naturalHeight
-  };
-};
+const DEFAULT_FRAME_SIZE = { width: 1080, height: 1080 };
 
 export default function CameraComponent({
   defaultOverlay = DEFAULT_OVERLAY,
@@ -44,7 +24,7 @@ export default function CameraComponent({
   onError,
   navigation = defaultNavigation,
 }: CameraComponentProps): JSX.Element {
-  const [frameDimensions, setFrameDimensions] = useState({ width: 1080, height: 1080 }); // Default 1:1 aspect ratio
+  const [frameDimensions, setFrameDimensions] = useState(DEFAULT_FRAME_SIZE);
   const { videoRef, initializationStatus: cameraStatus, startCamera } = useCamera({ 
     facingMode: 'user',
     frameDimensions
@@ -53,12 +33,12 @@ export default function CameraComponent({
   const [photo, setPhoto] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
-  const [previewSize, setPreviewSize] = useState({ width: 0, height: 0 });
-const overlayUrl = (typeof window !== 'undefined' && typeof localStorage !== 'undefined')
+  const [previewSize, setPreviewSize] = useState(DEFAULT_FRAME_SIZE);
+
+  const overlayUrl = (typeof window !== 'undefined' && typeof localStorage !== 'undefined')
     ? localStorage.getItem('overlayUrl') || defaultOverlay
     : defaultOverlay;
 
-  // Update preview size when frame dimensions change or on window resize
   useEffect(() => {
     const updatePreviewSize = (): void => {
       const screen = getAvailableScreenSpace();
@@ -66,14 +46,10 @@ const overlayUrl = (typeof window !== 'undefined' && typeof localStorage !== 'un
       setFrameDimensions(screen);
     };
 
-    // Initial update
     updatePreviewSize();
-
-    // Update on window resize
     window.addEventListener('resize', updatePreviewSize);
     return () => window.removeEventListener('resize', updatePreviewSize);
   }, []);
-
 
   const handleCapture = async (): Promise<void> => {
     if (!videoRef.current || cameraStatus.state !== 'ready') return;
@@ -84,15 +60,14 @@ const overlayUrl = (typeof window !== 'undefined' && typeof localStorage !== 'un
       setUploadedUrl(null);
 
       const overlay = await loadImage(overlayUrl);
-      const frameDims = getFrameDimensions(overlay);
       const photoData = await capturePhoto({
         video: videoRef.current,
-        width: frameDims.width,
-        height: frameDims.height,
+        width: frameDimensions.width,
+        height: frameDimensions.height,
         overlayImage: overlay
       });
 
-    setPhoto(photoData || null);
+      setPhoto(photoData || null);
       onPhotoCapture?.(photoData);
       await uploadPhoto(photoData);
     } catch (err) {
@@ -136,7 +111,6 @@ const overlayUrl = (typeof window !== 'undefined' && typeof localStorage !== 'un
     setPhoto(null);
     setUploadedUrl(null);
     
-    // Restart the camera stream
     try {
       await startCamera();
     } catch (err) {
@@ -161,13 +135,9 @@ const overlayUrl = (typeof window !== 'undefined' && typeof localStorage !== 'un
         throw new Error('Upload failed');
       }
 
-  interface UploadResponse { url: string }
+      interface UploadResponse { url: string }
       const result = await response.json() as UploadResponse;
-      if (result.url && result.url.length > 0) {
-        setUploadedUrl(result.url);
-      } else {
-        setUploadedUrl(null);
-      }
+      setUploadedUrl(result.url?.length > 0 ? result.url : null);
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Upload failed');
       console.error('Upload error:', error);
@@ -176,12 +146,11 @@ const overlayUrl = (typeof window !== 'undefined' && typeof localStorage !== 'un
   };
 
   if (cameraStatus.state === 'error') {
-    const nav = navigation || defaultNavigation;
     return (
       <div className="error-container">
         <p>Camera Error: {cameraStatus.message}</p>
         <button 
-          onClick={() => nav.reload()}
+          onClick={() => navigation.reload()}
           className="btn btn-primary"
         >
           Retry
@@ -196,7 +165,7 @@ const overlayUrl = (typeof window !== 'undefined' && typeof localStorage !== 'un
         <div className="error-container">
           <p>Camera Error: {error.message}</p>
           <button 
-            onClick={() => (navigation ?? defaultNavigation).reload()}
+            onClick={() => navigation.reload()}
             className="btn btn-primary"
           >
             Retry
@@ -204,79 +173,58 @@ const overlayUrl = (typeof window !== 'undefined' && typeof localStorage !== 'un
         </div>
       )}
     >
-    <div className="camera-container" style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        gap: '5%',
-        padding: '5%'
-      }} data-testid="camera-container">
+      <div className="camera-container">
         {!photo ? (
-          <div className="preview-container" style={{ 
-            position: 'relative',
-            width: '100%',
-            maxWidth: '640px',
-            aspectRatio: '1',
-            margin: '0 auto'
-          }}>
-          {cameraStatus.state === 'initializing' && (
-            <div className="loading-container">
-              <span className="loading-spinner" />
-              <p>Preparing camera...</p>
-            </div>
-          )}
-          {previewSize.width > 0 && (
-            <>
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                onCanPlay={() => {
-                  if (videoRef.current) {
-                    videoRef.current.play()
-                      .catch(err => {
-                        console.error('Video playback failed:', err);
-                        onError?.(new Error('Failed to start video playback'));
-                      });
-                  }
-                }}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  transform: 'scaleX(-1)',
-                  display: cameraStatus.state === 'ready' ? 'block' : 'none',
-                  borderRadius: '8px'
-                }}
-              />
-              <OverlayGuide 
-                width={previewSize.width}
-                height={previewSize.height}
-                className="overlay-guide"
-              />
-              <PhotoFrame
-                src={overlayUrl}
-                width={previewSize.width}
-                height={previewSize.height}
-                className="photo-frame"
-                ref={frameRef}
-              />
-            </>
-          )}
-        </div>
+          <div className="preview-container">
+            {cameraStatus.state === 'initializing' && (
+              <div className="loading-container">
+                <span className="loading-spinner" />
+                <p>Preparing camera...</p>
+              </div>
+            )}
+            {previewSize.width > 0 && (
+              <>
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  onCanPlay={() => {
+                    if (videoRef.current) {
+                      videoRef.current.play()
+                        .catch(err => {
+                          console.error('Video playback failed:', err);
+                          onError?.(new Error('Failed to start video playback'));
+                        });
+                    }
+                  }}
+                  className="video-preview"
+                  style={{
+                    display: cameraStatus.state === 'ready' ? 'block' : 'none'
+                  }}
+                />
+                <OverlayGuide 
+                  width={previewSize.width}
+                  height={previewSize.height}
+                  className="overlay-guide"
+                />
+                <PhotoFrame
+                  src={overlayUrl}
+                  width={previewSize.width}
+                  height={previewSize.height}
+                  className="photo-frame"
+                  ref={frameRef}
+                />
+              </>
+            )}
+          </div>
         ) : (
-          <div className="photo-container" data-testid="photo-container">
+          <div className="photo-container">
             <Image
               src={photo}
               alt="captured photo"
-              width={320}
-              height={320}
+              width={frameDimensions.width}
+              height={frameDimensions.height}
               className="photo-output"
               unoptimized
               priority
@@ -284,56 +232,49 @@ const overlayUrl = (typeof window !== 'undefined' && typeof localStorage !== 'un
           </div>
         )}
 
-      <div className="button-container" style={{
-        display: 'flex',
-        justifyContent: 'center',
-        gap: '5%',
-        width: '100%',
-        maxWidth: '640px'
-      }}>
-        {!photo && (
-          <button 
-            onClick={() => void handleCapture()} 
-            disabled={cameraStatus.state !== 'ready' || loading}
-            className={`btn btn-primary ${cameraStatus.state !== 'ready' || loading ? 'btn-disabled' : ''}`}
-          >
-            {loading ? (
-              <React.Fragment>
-                <span className="loading-spinner mr-2" />
-                Processing...
-              </React.Fragment>
-            ) : (
-              'Take Photo'
-            )}
-          </button>
+        <div className="button-container">
+          {!photo && (
+            <button 
+              onClick={() => void handleCapture()} 
+              disabled={cameraStatus.state !== 'ready' || loading}
+              className={`btn btn-primary ${cameraStatus.state !== 'ready' || loading ? 'btn-disabled' : ''}`}
+            >
+              {loading ? (
+                <>
+                  <span className="loading-spinner mr-2" />
+                  Processing...
+                </>
+              ) : (
+                'Take Photo'
+              )}
+            </button>
+          )}
+          {photo && (
+            <>
+              <button onClick={() => void handleDownload()} className="btn btn-primary">Download</button>
+              <button onClick={() => void handleShare()} className="btn btn-secondary">Share</button>
+              <button onClick={() => void handleReset()} className="btn btn-outline">New Photo</button>
+            </>
+          )}
+        </div>
+
+        {loading && (
+          <div className="status-text flex items-center">
+            <span className="loading-spinner mr-2" />
+            Processing...
+          </div>
         )}
-        {photo && (
-          <>
-            <button onClick={() => void handleDownload()} className="btn btn-primary">Download</button>
-            <button onClick={() => void handleShare()} className="btn btn-secondary">Share</button>
-            <button onClick={() => void handleReset()} className="btn btn-outline">New Photo</button>
-          </>
+        {uploadedUrl && (
+          <a 
+            href={uploadedUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="link-text"
+          >
+            View Online
+          </a>
         )}
       </div>
-
-      {loading && (
-        <div className="status-text flex items-center">
-          <span className="loading-spinner mr-2" />
-          Processing...
-        </div>
-      )}
-      {uploadedUrl && (
-        <a 
-          href={uploadedUrl} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="link-text"
-        >
-          View Online
-        </a>
-      )}
-    </div>
     </ErrorBoundary>
   );
 }
-
