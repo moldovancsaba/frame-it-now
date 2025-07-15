@@ -1,3 +1,25 @@
+## [v4.0.13] — 2025-07-15T17:15:28Z
+
+### Fixed
+- Found and fixed competing style definitions
+  - Removed extra styles.css file
+  - Moved gradient to @layer base in globals.css
+  - Fixed competing background declarations
+  - Cleaned up style file structure
+
+### Technical Details
+- Removed /styles.css to prevent style conflicts
+- Ensured all styles are in /styles/globals.css
+- Fixed background gradient in base layer
+- Removed unused style files
+
+### Developer Notes
+- Single source of truth for all styles
+- Background gradient properly set in base layer
+- No more competing style declarations
+- Clean style hierarchy in globals.css
+
+
 ## [v4.0.12] — 2025-07-15T17:12:39Z
 
 ### Fixed
