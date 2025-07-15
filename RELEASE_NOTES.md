@@ -1,3 +1,22 @@
+## [v4.0.9] — 2025-07-15T17:03:33Z
+
+### Fixed
+- Critical visual and layout fixes
+  - Fixed background gradient to correct colors and angle
+  - Improved container centering in available space
+  - Optimized landscape mode layout
+
+### Technical Details
+- Updated gradient with correct color values and 315deg angle
+- Adjusted container position to center in remaining space
+- Fixed landscape mode padding calculations
+
+### Developer Notes
+- Background gradient now matches design specification
+- Container properly centered after accounting for button space
+- Maintained all other styling and layout values
+
+
 ## [v4.0.8] — 2025-07-15T16:58:53Z
 
 ### Fixed
