@@ -1,5 +1,18 @@
 # Release Notes
 
+## [v4.0.2] — 2025-07-15T16:31:28Z
+
+### Fixed
+- Build failure due to missing CSS file reference
+  - Removed import of deleted camera.css from _app.tsx
+  - Cleaned up legacy CSS imports
+  - Verified build success after fix
+
+### Technical Details
+- Updated _app.tsx to remove non-existent CSS import
+- Confirmed all necessary styles are now in globals.css
+- Validated successful build after changes
+
 ## [v4.0.1] — 2025-07-15T16:29:16Z
 
 ### Fixed
