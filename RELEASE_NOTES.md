@@ -1,3 +1,25 @@
+## [v4.0.6] — 2025-07-15T16:47:35Z
+
+### Fixed
+- Critical style and UI fixes
+  - Removed duplicate "View Online" button
+  - Moved ALL styles to globals.css
+  - Removed all inline styles from components
+  - Fixed button layout in single line
+
+### Technical Details
+- Consolidated all styles into globals.css
+- Removed all style props from components
+- Fixed duplicate button rendering
+- Improved CSS organization and maintainability
+
+### Developer Notes
+- All styles now live in globals.css only
+- No inline styles in any components
+- Single source of truth for styling
+- Button row maintains consistent layout
+
+
 ## [v4.0.5] — 2025-07-15T16:43:41Z
 
 ### Fixed
