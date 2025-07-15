@@ -1,3 +1,25 @@
+## [v4.0.14] — 2025-07-15T17:17:40Z
+
+### Fixed
+- Fixed background gradient implementation
+  - Moved gradient to body element
+  - Added height: 100% to html and body
+  - Ensured proper height inheritance
+  - Fixed gradient visibility issues
+
+### Technical Details
+- Moved background gradient from html to body element
+- Added height: 100% to both html and body
+- Verified gradient fills entire viewport
+- Fixed element height inheritance chain
+
+### Developer Notes
+- Gradient now properly fills entire viewport
+- No more gray background showing through
+- Proper height inheritance through DOM tree
+- Clean implementation in globals.css
+
+
 ## [v4.0.13] — 2025-07-15T17:15:28Z
 
 ### Fixed
