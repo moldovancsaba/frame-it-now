@@ -151,7 +151,7 @@ export default function CameraComponent({
         <p>Camera Error: {cameraStatus.message}</p>
         <button 
           onClick={() => navigation.reload()}
-          className="btn btn-primary"
+          className="btn"
         >
           Retry
         </button>
@@ -166,7 +166,7 @@ export default function CameraComponent({
           <p>Camera Error: {error.message}</p>
           <button 
             onClick={() => navigation.reload()}
-            className="btn btn-primary"
+            className="btn"
           >
             Retry
           </button>
@@ -179,7 +179,7 @@ export default function CameraComponent({
             {cameraStatus.state === 'initializing' && (
               <div className="loading-container">
                 <span className="loading-spinner" />
-                <p>Preparing camera...</p>
+                <p className="loading-text">Preparing camera...</p>
               </div>
             )}
             {previewSize.width > 0 && (
@@ -198,10 +198,7 @@ export default function CameraComponent({
                         });
                     }
                   }}
-                  className="video-preview"
-                  style={{
-                    display: cameraStatus.state === 'ready' ? 'block' : 'none'
-                  }}
+                  className={`video-preview ${cameraStatus.state !== 'ready' ? 'video-preview-hidden' : ''}`}
                 />
                 <OverlayGuide 
                   width={previewSize.width}
@@ -233,24 +230,6 @@ export default function CameraComponent({
         )}
 
         <div className="button-container">
-          {photo && (
-            <>
-              <button onClick={() => void handleDownload()} className="btn">Download</button>
-              <button onClick={() => void handleShare()} className="btn">Share</button>
-              <button onClick={() => void handleReset()} className="btn">New Photo</button>
-              {uploadedUrl && (
-                <a 
-                  href={uploadedUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="link-text"
-                >
-                  View Online
-                </a>
-              )}
-            </>
-          )}
-
           {!photo && (
             <button 
               onClick={() => void handleCapture()} 
@@ -259,7 +238,7 @@ export default function CameraComponent({
             >
               {loading ? (
                 <>
-                  <span className="loading-spinner mr-2" />
+                  <span className="loading-spinner" />
                   Processing...
                 </>
               ) : (
@@ -267,23 +246,28 @@ export default function CameraComponent({
               )}
             </button>
           )}
+          {photo && uploadedUrl && (
+            <>
+              <button onClick={() => void handleDownload()} className="btn">Download</button>
+              <button onClick={() => void handleShare()} className="btn">Share</button>
+              <button onClick={() => void handleReset()} className="btn">New Photo</button>
+              <a 
+                href={uploadedUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="btn"
+              >
+                View Online
+              </a>
+            </>
+          )}
         </div>
 
         {loading && (
-          <div className="status-text flex items-center">
-            <span className="loading-spinner mr-2" />
-            Processing...
+          <div className="loading-container">
+            <span className="loading-spinner" />
+            <p className="loading-text">Processing...</p>
           </div>
-        )}
-        {uploadedUrl && (
-          <a 
-            href={uploadedUrl} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="link-text"
-          >
-            View Online
-          </a>
         )}
       </div>
     </ErrorBoundary>
