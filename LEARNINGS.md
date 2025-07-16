@@ -1,3 +1,52 @@
+## Camera Aspect Ratio and Viewport Handling
+
+### Problem
+Camera preview would sometimes not match the frame aspect ratio, and the viewport would allow scrolling, leading to a suboptimal user experience.
+
+### Solution
+1. Force 1:1 aspect ratio in camera constraints
+2. Use aspect-square on preview container
+3. Lock viewport dimensions and prevent scrolling
+4. Maintain container dimensions based on available space
+
+### Implementation Details
+- Camera constraints must specify aspectRatio: 1
+- Preview container should use flex with aspect-square
+- Viewport needs explicit height: 100vh and width: 100vw
+- Use overflow: hidden to prevent scrolling
+
+### Code Examples
+```typescript
+// Camera constraints
+const getVideoConstraints = () => ({
+  video: {
+    facingMode,
+    aspectRatio: 1,
+    width: { ideal: dimensions?.width || window.innerWidth },
+    height: { ideal: dimensions?.width || window.innerWidth }
+  }
+});
+
+// CSS
+html, body, #__next {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.preview-container {
+  @apply aspect-square;
+  @apply w-auto h-full;
+}
+```
+
+### Key Learnings
+1. Camera constraints must be explicit about aspect ratio
+2. Container dimensions should be derived from viewport
+3. Viewport dimensions must be locked to prevent scrolling
+4. Use CSS aspect-ratio for reliable square containers
+
+
 ## CSS and TailwindCSS Implementation
 
 ### TailwindCSS Media Query Constraints - 2025-07-15T16:29:16Z

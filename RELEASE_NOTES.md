@@ -1,3 +1,50 @@
+## [v5.0.0] — 2025-07-16T14:18:05Z
+
+### Added
+- Major camera preview and frame alignment system overhaul
+  - Implemented perfect aspect ratio matching between frame and video preview
+  - Fixed viewport sizing to prevent any scrolling
+  - Enhanced responsive layout handling
+  - Optimized camera constraints for consistent capture
+
+### Technical Details
+- Updated camera constraints to enforce 1:1 aspect ratio:
+  ```typescript
+  video: {
+    facingMode,
+    aspectRatio: 1,
+    width: { ideal: dimensions?.width || window.innerWidth },
+    height: { ideal: dimensions?.width || window.innerWidth }
+  }
+  ```
+- Enhanced container styling:
+  ```css
+  .preview-container {
+    @apply relative overflow-hidden;
+    @apply flex items-center justify-center;
+    @apply aspect-square;
+    @apply w-auto h-full;
+    @apply m-0;
+  }
+  ```
+- Fixed viewport handling:
+  ```css
+  html, body, #__next {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+  }
+  ```
+
+### Developer Notes
+- Camera preview and frame now maintain perfect alignment
+- Viewport fully utilized without scrolling
+- Container size automatically adjusts to screen dimensions
+- Clean implementation following React and Next.js best practices
+
+
 ## [v4.0.21] — 2025-07-16T12:06:05Z
 
 ### Fixed

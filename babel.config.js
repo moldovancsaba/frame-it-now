@@ -1,11 +1,10 @@
 module.exports = {
-  presets: [
-    ['@babel/preset-env', { targets: { node: 'current' } }],
-    '@babel/preset-typescript',
-    ['@babel/preset-react', { runtime: 'automatic' }],
-  ],
+  presets: ["next/babel"],
   plugins: [
-    '@babel/plugin-transform-runtime',
-    '@babel/plugin-transform-class-properties',
+    "@babel/plugin-transform-runtime",
+    "@babel/plugin-transform-class-properties",
+    "@babel/plugin-transform-object-rest-spread",
+    "@babel/plugin-syntax-dynamic-import",
+    "@babel/plugin-syntax-import-attributes",
   ],
 };

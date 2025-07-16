@@ -1,13 +1,13 @@
-/** @type {import('next').NextConfig} */
+/** @type {import("next").NextConfig} */
 const nextConfig = {
   images: {
-    formats: ['image/webp'],
+    formats: ["image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256],
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    domains: ['i.ibb.co', 'localhost'],
+    contentSecurityPolicy: "default-src \"self\"; script-src \"none\"; sandbox;",
+    domains: ["i.ibb.co", "localhost"],
     unoptimized: true,
   },
   webpack: (config, { dev, isServer }) => {
@@ -16,7 +16,7 @@ const nextConfig = {
       test: /\.(png|jpg|jpeg|gif)$/i,
       use: [
         {
-          loader: 'image-webpack-loader',
+          loader: "image-webpack-loader",
           options: {
             mozjpeg: {
               progressive: true,

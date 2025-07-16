@@ -99,5 +99,7 @@ export const capturePhoto = async ({
   ctx.restore();
 
   // Convert to PNG with maximum quality
-  return canvas.toDataURL('image/png', 1.0);
+  const dataUrl = await createImageBitmap(canvas)
+    .then(() => canvas.toDataURL('image/png', 1.0));
+  return dataUrl;
 };
