@@ -32,7 +32,7 @@ interface ImageValidationOptions {
 }
 
 /**
- * Captures a photo from video stream with optional overlay
+ * Captures a photo from video stream with optional overlay at maximum available resolution
  * 
  * @param {CaptureConfig} config - Configuration for photo capture
  * @returns {Promise<string>} Data URL of the captured image
@@ -43,66 +43,72 @@ export const capturePhoto = async ({
   height,
   overlayImage
 }: CaptureConfig): Promise<string> => {
-  // Create canvas for capture
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d');
-
-  if (!ctx) {
-    throw new Error('Could not get canvas context');
-  }
-
   // Validate video element and its source
   if (!video || typeof video !== 'object') {
     throw new Error('Invalid video element provided');
-  }
-
-  // Check video dimensions first to match test expectations
-  if (!video.videoWidth || !video.videoHeight) {
-    throw new Error('Invalid video dimensions');
   }
 
   if (!video.srcObject) {
     throw new Error('No video source available');
   }
 
-  // Calculate dimensions while preserving aspect ratio
-  const videoWidth = video.videoWidth;
-  const videoHeight = video.videoHeight;
+  // Get the actual video track settings for maximum resolution
+  const videoTrack = (video.srcObject as MediaStream).getVideoTracks()[0];
+  const settings = videoTrack.getSettings();
+  const actualWidth = settings.width || video.videoWidth;
+  const actualHeight = settings.height || video.videoHeight;
 
-  // Validate video dimensions
-  if (!videoWidth || !videoHeight) {
-    throw new Error('Invalid video dimensions');
+  // Create canvas at the maximum available resolution
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(width, actualWidth);
+  canvas.height = Math.max(height, actualHeight);
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) {
+    throw new Error('Could not get canvas context');
   }
 
-  const side = Math.min(videoWidth, videoHeight);
-  const sx = (videoWidth - side) / 2;
-  const sy = (videoHeight - side) / 2;
+  // Calculate dimensions while preserving aspect ratio
+  const videoAspect = actualWidth / actualHeight;
+  const targetAspect = width / height;
+
+  let drawWidth, drawHeight, offsetX = 0, offsetY = 0;
+
+  // Calculate dimensions to fill the frame while maintaining aspect ratio
+  if (videoAspect > targetAspect) {
+    drawHeight = canvas.height;
+    drawWidth = drawHeight * videoAspect;
+    offsetX = (drawWidth - canvas.width) / 2;
+  } else {
+    drawWidth = canvas.width;
+    drawHeight = drawWidth / videoAspect;
+    offsetY = (drawHeight - canvas.height) / 2;
+  }
 
   // Clear canvas
-  ctx.clearRect(0, 0, width, height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Mirror and draw video frame
+  // Mirror and draw video frame at full resolution
+  ctx.save();
   ctx.scale(-1, 1);
-  ctx.drawImage(video, sx, sy, side, side, -width, 0, width, height);
-  ctx.scale(-1, 1); // Reset transform
+  ctx.drawImage(
+    video,
+    -canvas.width - offsetX,
+    -offsetY,
+    drawWidth,
+    drawHeight
+  );
+  ctx.restore();
 
-  // Add overlay if provided
+  // Add overlay if provided, scaling it to match the canvas size
   if (overlayImage) {
-    ctx.drawImage(overlayImage, 0, 0, width, height);
+    ctx.drawImage(overlayImage, 0, 0, canvas.width, canvas.height);
   }
 
-  // Convert to data URL
-  return canvas.toDataURL('image/png');
+  // Convert to high-quality PNG
+  return canvas.toDataURL('image/png', 1.0);
 };
 
-/**
- * Loads an image from URL
- * 
- * @param {string} url - URL of the image to load
- * @returns {Promise<HTMLImageElement>} Loaded image element
- */
 /**
  * Process a captured image
  * 
@@ -124,7 +130,7 @@ export const processImage = async (imageData: string): Promise<ProcessedImage> =
   return {
     width: img.naturalWidth,
     height: img.naturalHeight,
-    format: imageData.split(';')[0].split('/')[1],
+    format: imageData.split(';')[0].split('/')?.[1] || 'png',
     dataUrl: imageData
   };
 };
@@ -138,77 +144,31 @@ export const processImage = async (imageData: string): Promise<ProcessedImage> =
  */
 export const validateImage = (imageData: ProcessedImage, options: ImageValidationOptions = {}): boolean => {
   const {
-    minWidth = 640,
-    minHeight = 480,
-    maxWidth = 4096,
-    maxHeight = 4096,
+    minWidth = 1920,  // Minimum Full HD
+    minHeight = 1920, // Minimum Full HD
+    maxWidth = 8192,  // Support up to 8K
+    maxHeight = 8192, // Support up to 8K
     allowedFormats = ['jpeg', 'png']
   } = options;
 
   // Check dimensions
   if (imageData.width < minWidth || imageData.height < minHeight) {
+    console.warn('Image resolution below minimum:', imageData.width, 'x', imageData.height);
     return false;
   }
 
   if (imageData.width > maxWidth || imageData.height > maxHeight) {
+    console.warn('Image resolution above maximum:', imageData.width, 'x', imageData.height);
     return false;
   }
 
   // Check format
   if (!allowedFormats.includes(imageData.format.toLowerCase())) {
+    console.warn('Unsupported image format:', imageData.format);
     return false;
   }
 
   return true;
-};
-
-/**
- * Initialize camera with specified configuration
- * 
- * @param {CameraConfig} config - Camera configuration options
- * @returns {Promise<{ stream: MediaStream; status: CameraStatus; }>} Camera initialization result
- */
-export const initializeCamera = async (
-  config: CameraConfig,
-  options: { retries?: number } = {}
-): Promise<{ stream: MediaStream; status: CameraStatus }> => {
-  const maxRetries = options.retries || 0;
-  let lastError: Error | null = null;
-  
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: config.facingMode,
-          width: config.width ? { ideal: config.width } : undefined,
-          height: config.height ? { ideal: config.height } : undefined
-        }
-      });
-
-      return {
-        stream,
-        status: CameraStatus.READY
-      };
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error('Camera initialization failed');
-      
-      if (error instanceof Error) {
-        if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-          throw new Error('Camera access denied');
-        }
-      }
-      
-      // Only retry if we haven't reached max retries
-      if (attempt === maxRetries) {
-        throw lastError;
-      }
-      
-      // Wait before retry
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    }
-  }
-  
-  throw lastError || new Error('Camera initialization failed');
 };
 
 /**
