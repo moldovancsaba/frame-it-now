@@ -49,24 +49,16 @@ export const useCamera = ({ facingMode = 'user', frameDimensions }: UseCameraOpt
     message?: string;
   }>({ state: 'initializing' });
 
-  // Helper function to get video constraints that maximize resolution
+  // Helper function to get video constraints
   const getVideoConstraints = () => ({
     video: {
+      // Set facingMode for front/back camera
       facingMode,
-      width: { ideal: 4096, min: 1920 },  // Request 4K, minimum Full HD
-      height: { ideal: 4096, min: 1920 }, // Request 4K, minimum Full HD
-      frameRate: { ideal: 30 },           // Optimal frame rate for quality
-      aspectRatio: { ideal: 1 },          // Square aspect ratio for frame
-      ...frameDimensions && {
-        width: { 
-          min: 1920,                      // Ensure minimum Full HD
-          ideal: Math.max(4096, frameDimensions.width) // Use larger of 4K or frame size
-        },
-        height: { 
-          min: 1920,                      // Ensure minimum Full HD
-          ideal: Math.max(4096, frameDimensions.height) // Use larger of 4K or frame size
-        }
-      }
+      // Request specific aspect ratio for frame
+      aspectRatio: 1,
+      // Basic size constraints that work across devices
+      width: { min: 1080 },
+      height: { min: 1080 }
     }
   });
 
@@ -105,11 +97,6 @@ export const useCamera = ({ facingMode = 'user', frameDimensions }: UseCameraOpt
         }
         throw err;
       });
-
-      // Get the actual track settings
-      const videoTrack = stream.getVideoTracks()[0];
-      const settings = videoTrack.getSettings();
-      console.log('Camera resolution:', settings.width, 'x', settings.height);
 
       // Stop any existing stream before setting new one
       stopCamera();
