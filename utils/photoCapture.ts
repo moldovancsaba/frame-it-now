@@ -32,7 +32,8 @@ interface ImageValidationOptions {
 }
 
 /**
- * Captures a photo from video stream with optional overlay at maximum available resolution
+ * Captures a photo from video stream with optional overlay at maximum resolution
+ * Uses the native video resolution to ensure highest quality capture
  * 
  * @param {CaptureConfig} config - Configuration for photo capture
  * @returns {Promise<string>} Data URL of the captured image
@@ -43,6 +44,20 @@ export const capturePhoto = async ({
   height,
   overlayImage
 }: CaptureConfig): Promise<string> => {
+  // Get the native video resolution
+  const nativeWidth = video.videoWidth;
+  const nativeHeight = video.videoHeight;
+
+  // Create canvas at native resolution
+  const canvas = document.createElement('canvas');
+  canvas.width = nativeWidth;
+  canvas.height = nativeHeight;
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) {
+    throw new Error('Could not get canvas context');
+  }
+
   // Validate video element and its source
   if (!video || typeof video !== 'object') {
     throw new Error('Invalid video element provided');
@@ -52,57 +67,26 @@ export const capturePhoto = async ({
     throw new Error('No video source available');
   }
 
-  // Get the actual video track settings for maximum resolution
-  const videoTrack = (video.srcObject as MediaStream).getVideoTracks()[0];
-  const settings = videoTrack.getSettings();
-  const actualWidth = settings.width || video.videoWidth;
-  const actualHeight = settings.height || video.videoHeight;
-
-  // Create canvas at the maximum available resolution
-  const canvas = document.createElement('canvas');
-  canvas.width = Math.max(width, actualWidth);
-  canvas.height = Math.max(height, actualHeight);
-  const ctx = canvas.getContext('2d');
-
-  if (!ctx) {
-    throw new Error('Could not get canvas context');
-  }
-
-  // Calculate dimensions while preserving aspect ratio
-  const videoAspect = actualWidth / actualHeight;
-  const targetAspect = width / height;
-
-  let drawWidth, drawHeight, offsetX = 0, offsetY = 0;
-
-  // Calculate dimensions to fill the frame while maintaining aspect ratio
-  if (videoAspect > targetAspect) {
-    drawHeight = canvas.height;
-    drawWidth = drawHeight * videoAspect;
-    offsetX = (drawWidth - canvas.width) / 2;
-  } else {
-    drawWidth = canvas.width;
-    drawHeight = drawWidth / videoAspect;
-    offsetY = (drawHeight - canvas.height) / 2;
-  }
+  // Calculate dimensions for square crop while preserving aspect ratio
+  const side = Math.min(nativeWidth, nativeHeight);
+  const sx = (nativeWidth - side) / 2;
+  const sy = (nativeHeight - side) / 2;
 
   // Clear canvas
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, nativeWidth, nativeHeight);
 
-  // Mirror and draw video frame at full resolution
-  ctx.save();
+  // Mirror and draw video frame at native resolution
   ctx.scale(-1, 1);
   ctx.drawImage(
     video,
-    -canvas.width - offsetX,
-    -offsetY,
-    drawWidth,
-    drawHeight
+    sx, sy, side, side,
+    -nativeWidth, 0, nativeWidth, nativeHeight
   );
-  ctx.restore();
+  ctx.scale(-1, 1); // Reset transform
 
-  // Add overlay if provided, scaling it to match the canvas size
+  // Add overlay if provided, scaling it to match the full resolution
   if (overlayImage) {
-    ctx.drawImage(overlayImage, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(overlayImage, 0, 0, nativeWidth, nativeHeight);
   }
 
   // Convert to high-quality PNG
@@ -144,10 +128,10 @@ export const processImage = async (imageData: string): Promise<ProcessedImage> =
  */
 export const validateImage = (imageData: ProcessedImage, options: ImageValidationOptions = {}): boolean => {
   const {
-    minWidth = 1920,  // Minimum Full HD
-    minHeight = 1920, // Minimum Full HD
-    maxWidth = 8192,  // Support up to 8K
-    maxHeight = 8192, // Support up to 8K
+    minWidth = 1080,    // Minimum resolution matches frame
+    minHeight = 1080,   // Minimum resolution matches frame
+    maxWidth = 4096,    // Support up to 4K
+    maxHeight = 4096,   // Support up to 4K
     allowedFormats = ['jpeg', 'png']
   } = options;
 
