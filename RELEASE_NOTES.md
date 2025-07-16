@@ -1,3 +1,30 @@
+## [v4.0.21] — 2025-07-16T12:06:05Z
+
+### Fixed
+- Camera constraints issue
+  - Simplified camera constraints to fix invalid constraint error
+  - Set minimum resolution to match frame size (1080x1080)
+  - Added square aspect ratio constraint
+  - Removed complex resolution handling
+
+### Technical Details
+- Streamlined video constraints:
+  ```typescript
+  video: {
+    facingMode,
+    aspectRatio: 1,
+    width: { min: 1080 },
+    height: { min: 1080 }
+  }
+  ```
+
+### Developer Notes
+- Camera now starts with basic, valid constraints
+- Frame size requirements are enforced as minimums
+- Aspect ratio ensures square capture
+- Clean, maintainable constraint setup
+
+
 ## [v4.0.20] — 2025-07-16T11:48:17Z
 
 ### Fixed

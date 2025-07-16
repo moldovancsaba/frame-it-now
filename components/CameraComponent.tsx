@@ -34,6 +34,11 @@ export default function CameraComponent({
   const [loading, setLoading] = useState(false);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
   const [previewSize, setPreviewSize] = useState(DEFAULT_FRAME_SIZE);
+  const [videoMetrics, setVideoMetrics] = useState({
+    width: 0,
+    height: 0,
+    aspectRatio: 1
+  });
 
   const overlayUrl = (typeof window !== 'undefined' && typeof localStorage !== 'undefined')
     ? localStorage.getItem('overlayUrl') || defaultOverlay
@@ -107,6 +112,16 @@ export default function CameraComponent({
     link.click();
   };
 
+  const handleVideoMetadata = () => {
+    if (videoRef.current) {
+      setVideoMetrics({
+        width: videoRef.current.videoWidth,
+        height: videoRef.current.videoHeight,
+        aspectRatio: videoRef.current.videoWidth / videoRef.current.videoHeight
+      });
+    }
+  };
+
   const handleReset = async (): Promise<void> => {
     setPhoto(null);
     setUploadedUrl(null);
@@ -175,7 +190,13 @@ export default function CameraComponent({
     >
       <div className="camera-container">
         {!photo ? (
-          <div className="preview-container">
+          <div className="preview-container" style={{
+            position: 'relative',
+            width: '100%',
+            maxWidth: previewSize.width,
+            aspectRatio: videoMetrics.aspectRatio,
+            margin: '0 auto'
+          }}>
             {cameraStatus.state === 'initializing' && (
               <div className="loading-container">
                 <span className="loading-spinner" />
@@ -189,6 +210,7 @@ export default function CameraComponent({
                   autoPlay
                   playsInline
                   muted
+                  onLoadedMetadata={() => handleVideoMetadata()}
                   onCanPlay={() => {
                     if (videoRef.current) {
                       videoRef.current.play()
