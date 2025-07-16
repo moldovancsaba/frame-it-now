@@ -1,3 +1,25 @@
+## [v4.0.20] — 2025-07-16T11:48:17Z
+
+### Fixed
+- Photo resolution maximization
+  - Now using native video resolution for captures
+  - Removed downscaling during capture
+  - Preserves full camera quality
+  - High-quality PNG output
+
+### Technical Details
+- Use video.videoWidth/videoHeight for native resolution
+- Create canvas at full native resolution
+- Keep original dimensions for frame overlay
+- Maximum quality PNG output (quality=1.0)
+
+### Developer Notes
+- Photos now match camera resolution
+- No quality loss during capture
+- Clean, simple resolution handling
+- Full resolution preserved throughout
+
+
 ## [v4.0.19] — 2025-07-16T11:44:22Z
 
 ### Fixed
