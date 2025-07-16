@@ -1,3 +1,27 @@
+## [v4.0.19] — 2025-07-16T11:44:22Z
+
+### Fixed
+- Maximum photo resolution implementation
+  - Request up to 4K resolution from camera
+  - Use actual camera capabilities
+  - Maintain full resolution in captures
+  - Optimize frame overlay quality
+
+### Technical Details
+- Added explicit resolution constraints:
+  - Minimum: 1920x1920 (Full HD)
+  - Ideal: 4096x4096 (4K)
+- Use actual video track settings for capture
+- Improved canvas scaling logic
+- High-quality PNG output with maximum quality
+
+### Developer Notes
+- Camera now requests maximum available resolution
+- Captures preserve full camera resolution
+- No downscaling unless absolutely necessary
+- Image quality prioritized throughout pipeline
+
+
 ## [v4.0.18] — 2025-07-15T17:29:27Z
 
 ### Fixed
