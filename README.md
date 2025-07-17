@@ -56,7 +56,18 @@ This project uses TypeScript for enhanced type safety and developer experience. 
 - Strict type checking enabled
 - Modern TypeScript/React patterns
 
-## Deployment (v3.0.0)
+## Breaking Changes in v6.0.0
+
+Version 6.0.0 introduces fundamental improvements to the core functionality:
+- Complete rewrite of frame aspect ratio handling
+- Enhanced camera preview system
+- Improved photo capture mechanism
+- Fixed frame positioning and alignment
+- Better responsiveness in landscape mode
+
+These changes significantly improve the user experience but may require updates to any custom frame implementations.
+
+## Deployment (v6.0.0)
 
 Follow these steps to deploy the application:
 

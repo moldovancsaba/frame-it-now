@@ -1,70 +1,50 @@
 import React from 'react';
+import Image from 'next/image';
 
 interface OverlayGuideProps {
-  width?: number;
-  height?: number;
+  src?: string;
+  width: number;
+  height: number;
   className?: string;
 }
 
 /**
- * OverlayGuide Component
- * Renders an SVG guide overlay for face positioning
- * 
- * @param {number} width - Width of the guide overlay (default: 200)
- * @param {number} height - Height of the guide overlay (default: 200)
+ * Renders an SVG guide overlay for photo composition
+ * Can either use a built-in grid or a custom SVG from URL
  */
-export const OverlayGuide: React.FC<OverlayGuideProps> = ({ 
-  width = 200, 
-  height = 200,
-  className = ''
-}) => {
+export default function OverlayGuide({ src, width, height, className }: OverlayGuideProps): JSX.Element {
+  if (src) {
+    return (
+      <div className={className}>
+        <Image
+          src={src}
+          alt="composition guide"
+          width={width}
+          height={height}
+          className="object-contain"
+          unoptimized
+        />
+      </div>
+    );
+  }
+
+  // Default grid guide if no SVG provided
   return (
     <svg
-      viewBox="0 0 300 300"
       width={width}
       height={height}
+      viewBox={`0 0 ${width} ${height}`}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
       className={className}
     >
-      {/* Face outline */}
-      <ellipse 
-        cx="150" 
-        cy="140" 
-        rx="90" 
-        ry="110" 
-        fill="none" 
-        stroke="#20e3b2" 
-        strokeWidth="4" 
-      />
-      {/* Left eye */}
-      <ellipse 
-        cx="115" 
-        cy="120" 
-        rx="14" 
-        ry="10" 
-        fill="#fbc531" 
-        stroke="#8c52ff" 
-        strokeWidth="2" 
-      />
-      {/* Right eye */}
-      <ellipse 
-        cx="185" 
-        cy="120" 
-        rx="14" 
-        ry="10" 
-        fill="#fbc531" 
-        stroke="#8c52ff" 
-        strokeWidth="2" 
-      />
-      {/* Smile */}
-      <path 
-        d="M120 185 Q150 220 180 185" 
-        stroke="#ff5f7e" 
-        strokeWidth="5" 
-        fill="none" 
-        strokeLinecap="round" 
-      />
+      {/* Rule of thirds grid */}
+      <g stroke="rgba(255,255,255,0.5)" strokeWidth="1">
+        <line x1={width/3} y1={0} x2={width/3} y2={height} />
+        <line x1={width*2/3} y1={0} x2={width*2/3} y2={height} />
+        <line x1={0} y1={height/3} x2={width} y2={height/3} />
+        <line x1={0} y1={height*2/3} x2={width} y2={height*2/3} />
+      </g>
     </svg>
   );
-};
-
-export default OverlayGuide;
+}

@@ -12,6 +12,7 @@
 - Performance optimization research (Due: 2024-03-30T12:00:00.000Z)
 
 ## Completed Tasks
+- Fixed frame overlay application in photo capture (Completed: 2024-01-24T12:00:00.000Z)
 - Implemented services directory structure (Completed: 2024-01-27T15:45:00.000Z)
 - Enhanced component integration system (Completed: 2024-01-27T15:45:00.000Z)
 - TypeScript migration (Completed: 2024-01-25T10:00:00.000Z)

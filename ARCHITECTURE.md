@@ -1,3 +1,41 @@
+## Frame Overlay Rendering System
+
+### Components
+
+1. PhotoFrame Component
+   - Manages frame overlay positioning and scaling
+   - Handles frame URL state management
+   - Ensures consistent rendering across preview and capture modes
+
+2. Canvas Integration
+   - Uses HTML5 Canvas for frame composition
+   - Maintains proper z-index layering
+   - Handles frame scaling and positioning calculations
+
+### State Management
+
+- Frame URL states:
+  - Selected: Current frame URL in memory
+  - Active: Frame being rendered on canvas
+  - Preview: Frame shown in thumbnail selection
+
+### Rendering Pipeline
+
+1. Frame Loading
+   - Validate frame URL
+   - Pre-load image for performance
+   - Handle loading errors gracefully
+
+2. Canvas Operations
+   - Create canvas context
+   - Apply frame overlay with proper positioning
+   - Handle canvas state cleanup
+
+3. Frame Composition
+   - Calculate proper scaling factors
+   - Position frame relative to photo/preview
+   - Apply any necessary transformations
+
 # System Architecture
 
 ### Camera System Implementation
@@ -153,6 +191,34 @@ All states are managed through a dedicated CameraService class with error bounda
    - Type-safe service interfaces
    - Centralized state updates
 
+### URL Validation Flow
+
+1. **Input Validation Layer**
+   - Basic URL format validation using TypeScript URL constructor
+   - Custom protocol allowlist (http://, https://, data:)
+   - Domain validation against approved list
+   - Path and query parameter sanitization
+
+2. **Content Verification**
+   - HEAD request to verify resource existence
+   - Content-Type validation against allowed types
+   - Content-Length checks for size limits
+   - SSL certificate validation for HTTPS URLs
+
+3. **Error Categories**
+   - Malformed URL format
+   - Disallowed protocol
+   - Unauthorized domain
+   - Invalid content type
+   - Resource size exceeded
+   - Network/SSL errors
+
+4. **Recovery Actions**
+   - User notification with specific error details
+   - Automatic redirect to HTTPS when available
+   - Retry mechanism for temporary network issues
+   - Fallback to default resource on validation failure
+
 ### Component Relationships
 1. **UI Layer**
    - CameraComponent (Parent)
@@ -165,6 +231,7 @@ All states are managed through a dedicated CameraService class with error bounda
      ↳ StreamManager
      ↳ ErrorHandler
      ↳ StateManager
+     ↳ URLValidator
 
 3. **Utility Layer**
    - TypeGuards

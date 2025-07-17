@@ -1,3 +1,26 @@
+## Frontend
+
+### Canvas State Management
+
+When working with canvas in photo capture applications, proper state management is crucial:
+
+1. Canvas Context Lifecycle
+   - Always clear canvas context before new frame renders
+   - Properly dispose of unused contexts to prevent memory leaks
+   - Maintain clean state between frame switches
+
+2. State Persistence
+   - Store frame URLs in dedicated state manager
+   - Track active vs. selected frame states separately
+   - Use proper cleanup on component unmount
+
+3. Common Pitfalls
+   - Avoid multiple frame renders without clearing
+   - Prevent state conflicts between preview/capture modes
+   - Clean up resources on frame changes
+
+Learning: Implementing proper canvas cleanup and state management prevents memory leaks and ensures consistent frame rendering across the application.
+
 ## Camera Aspect Ratio and Viewport Handling
 
 ### Problem
@@ -237,6 +260,79 @@ Implementing a consistent, overflow-free camera preview that maintains proper sc
 3. Maintain proper state management
 4. Implement comprehensive error handling
 5. Follow native camera app conventions
+
+## Security Implementation
+
+### URL Validation Security - 2025-07-16T15:30:00.000Z
+
+#### Challenge
+Implementing secure URL validation to prevent security vulnerabilities while maintaining usability.
+
+#### Key Learnings
+1. URL Validation Best Practices:
+   - Use built-in URL constructor for basic format validation
+   - Implement strict protocol allowlist (http/https/data)
+   - Validate domains against approved list
+   - Sanitize path and query parameters
+   - Prevent URL encoding attacks
+
+2. Content-Type Verification:
+   - Always verify Content-Type before processing
+   - Use HEAD requests to check resource metadata
+   - Implement size limits for resources
+   - Validate SSL certificates for HTTPS URLs
+   - Handle timeouts and network errors
+
+3. Common Attack Vectors Prevented:
+   - Protocol injection via custom schemes
+   - Path traversal attacks
+   - Large file DoS attempts
+   - Mixed content vulnerabilities
+   - Invalid SSL certificate bypass
+
+4. Implementation Details:
+   ```typescript
+   const validateURL = async (url: string): Promise<ValidationResult> => {
+     // Basic URL format validation
+     const parsedURL = new URL(url);
+     
+     // Protocol validation
+     if (!['http:', 'https:', 'data:'].includes(parsedURL.protocol)) {
+       throw new Error('INVALID_PROTOCOL');
+     }
+     
+     // Domain validation
+     if (!isAllowedDomain(parsedURL.hostname)) {
+       throw new Error('UNAUTHORIZED_DOMAIN');
+     }
+     
+     // Content verification (for http/https)
+     if (parsedURL.protocol !== 'data:') {
+       const response = await fetch(url, {
+         method: 'HEAD',
+         headers: { Accept: 'image/*' }
+       });
+       
+       if (!response.headers.get('content-type')?.startsWith('image/')) {
+         throw new Error('INVALID_CONTENT_TYPE');
+       }
+       
+       const contentLength = response.headers.get('content-length');
+       if (contentLength && parseInt(contentLength) > MAX_SIZE) {
+         throw new Error('RESOURCE_TOO_LARGE');
+       }
+     }
+     
+     return { valid: true, url: parsedURL.toString() };
+   };
+   ```
+
+#### Best Practices Established
+1. Always validate URLs before use
+2. Implement strict protocol and domain allowlists
+3. Verify content type and size before processing
+4. Use built-in URL parsing when possible
+5. Implement proper error handling and recovery
 
 ## Frontend
 

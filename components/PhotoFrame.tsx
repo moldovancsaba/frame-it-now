@@ -24,19 +24,17 @@ interface PhotoFrameProps extends BaseProps {
   onFrameDimensionsChange?: (dimensions: { width: number; height: number }) => void;
 }
 
-const PhotoFrame = forwardRef<HTMLImageElement, PhotoFrameProps>(function PhotoFrame(props, ref) {
-  const {
-    src,
-    className = "",
-    style,
-    onError,
-    isReady = true,
-    onFrameDimensionsChange,
-    width,
-    height,
-    ...otherProps
-  } = props;
-
+const PhotoFrame = forwardRef<HTMLImageElement, PhotoFrameProps>(({
+  src,
+  className = "",
+  style,
+  onError,
+  isReady = true,
+  onFrameDimensionsChange,
+  width,
+  height,
+  ...otherProps
+}, ref): JSX.Element => {
   const handleError = (): void => {
     if (onError) {
       const error = new Error("Image loading failed");
@@ -44,17 +42,19 @@ const PhotoFrame = forwardRef<HTMLImageElement, PhotoFrameProps>(function PhotoF
     }
   };
 
-  // Update dimensions when screen size changes
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const updateDimensions = () => {
-        const dimensions = getAvailableScreenSpace();
-        onFrameDimensionsChange?.(dimensions);
-      };
+  const dimensions = getAvailableScreenSpace();
 
-      updateDimensions();
-      window.addEventListener("resize", updateDimensions);
-      return () => window.removeEventListener("resize", updateDimensions);
+  useEffect(() => {
+    const handleResize = (): void => {
+      const newDimensions = getAvailableScreenSpace();
+      onFrameDimensionsChange?.(newDimensions);
+    };
+
+    handleResize();
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("resize", handleResize);
+      return (): void => window.removeEventListener("resize", handleResize);
     }
   }, [onFrameDimensionsChange]);
 
@@ -63,8 +63,6 @@ const PhotoFrame = forwardRef<HTMLImageElement, PhotoFrameProps>(function PhotoF
     !isReady && "photo-frame-hidden",
     className
   ].filter(Boolean).join(" ");
-
-  const dimensions = getAvailableScreenSpace();
 
   return (
     <Image
@@ -83,5 +81,7 @@ const PhotoFrame = forwardRef<HTMLImageElement, PhotoFrameProps>(function PhotoF
     />
   );
 });
+
+PhotoFrame.displayName = 'PhotoFrame';
 
 export default PhotoFrame;

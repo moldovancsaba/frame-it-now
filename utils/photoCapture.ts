@@ -67,26 +67,53 @@ export const capturePhoto = async ({
     throw new Error('No video source available');
   }
 
-  // Calculate dimensions for square crop while preserving aspect ratio
-  const side = Math.min(nativeWidth, nativeHeight);
-  const sx = (nativeWidth - side) / 2;
-  const sy = (nativeHeight - side) / 2;
+  // Calculate dimensions while preserving the target aspect ratio
+  const targetAspectRatio = width / height;
+  let cropWidth, cropHeight, sx, sy;
 
-  // Clear canvas
-  ctx.clearRect(0, 0, nativeWidth, nativeHeight);
+  if (nativeWidth / nativeHeight > targetAspectRatio) {
+    // Video is wider than target, crop width
+    cropHeight = nativeHeight;
+    cropWidth = nativeHeight * targetAspectRatio;
+    sx = (nativeWidth - cropWidth) / 2;
+    sy = 0;
+  } else {
+    // Video is taller than target, crop height
+    cropWidth = nativeWidth;
+    cropHeight = nativeWidth / targetAspectRatio;
+    sx = 0;
+    sy = (nativeHeight - cropHeight) / 2;
+  }
 
-  // Mirror and draw video frame at native resolution
+  // Clear canvas and set to target dimensions
+  canvas.width = width;
+  canvas.height = height;
+  ctx.clearRect(0, 0, width, height);
+
+  // Mirror and draw video frame
   ctx.scale(-1, 1);
   ctx.drawImage(
     video,
-    sx, sy, side, side,
-    -nativeWidth, 0, nativeWidth, nativeHeight
+    sx, sy, cropWidth, cropHeight,
+    -width, 0, width, height
   );
   ctx.scale(-1, 1); // Reset transform
 
-  // Add overlay if provided, scaling it to match the full resolution
+  // Validate overlay image if provided
+  if (overlayImage && (!overlayImage.complete || !overlayImage.naturalWidth)) {
+    throw new Error('Invalid or incomplete overlay image');
+  }
+
+  // Add overlay if provided, with proper state management and positioning
   if (overlayImage) {
-    ctx.drawImage(overlayImage, 0, 0, nativeWidth, nativeHeight);
+    // Preserve canvas state
+    ctx.save();
+    // Reset any transforms
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    // Draw overlay scaled to match the target dimensions
+    ctx.drawImage(overlayImage, 0, 0, width, height);
+    // Restore canvas state
+    ctx.restore();
   }
 
   // Convert to high-quality PNG

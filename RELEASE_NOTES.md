@@ -1,3 +1,107 @@
+## [5.2.0] - 2024-01-24T12:00:00.000Z
+
+### Fixed
+- Frame overlay application in photo capture
+- Frame URL handling logic for selected and active states
+
+## [v5.1.3] — 2025-07-17T00:50:40Z
+
+### Fixed
+- Asset creation error handling in admin interface
+  - Enhanced error display for validation failures
+  - Added detailed error messages for API responses
+  - Improved error feedback for invalid asset creation
+
+### Technical Details
+- Updated ApiErrorResponse interface to include validation details
+- Added proper error detail extraction from API responses
+- Improved error message formatting
+
+### Developer Notes
+- Error messages now provide clear validation feedback
+- Better guidance for form validation failures
+- Improved development experience with clearer error handling
+
+## [v5.1.2] — 2025-07-17T00:50:40Z
+
+### Fixed
+- Asset creation API bug in admin interface
+  - Fixed validation to properly handle JSON content for frames and guides
+  - Removed unnecessary form-data validation
+  - Improved error handling for asset creation
+
+### Technical Details
+- Updated asset validation to handle both JSON and form-data payloads
+- Removed legacy form-data parsing requirement
+- Enhanced validation error messages
+- Fixed incorrect content-type restrictions
+
+### Developer Notes
+- Asset creation now works properly in admin interface
+- Validation provides clear error messages
+- Code is more maintainable with unified validation
+
+## [v5.1.1] — 2025-07-17T00:47:50Z
+
+### Fixed
+- Build error caused by unused `parseForm` import
+  - Removed reference to unused import in asset management API
+  - Fixed TypeScript linting errors
+  - Verified successful build after fix
+
+### Technical Details
+- Resolved TypeScript/ESLint warning for unused variable
+- Enhanced code cleanliness by removing unused imports
+- Verified build process completes without errors
+
+### Developer Notes
+- Clean codebase with no unused imports
+- ESLint rules properly enforced
+- Build process now succeeds without warnings
+
+## [v5.1.0] — 2025-07-16T15:30:00.000Z
+
+### Added
+- Comprehensive URL validation and security system
+  - Implemented strict URL format validation
+  - Added content-type verification
+  - Enhanced security against common attack vectors
+  - Improved error handling and recovery
+
+### Security
+- Added protocol allowlist (http, https, data)
+- Implemented domain validation
+- Added content-type verification
+- Added resource size limits
+- Enhanced SSL certificate validation
+- Improved error handling for malicious URLs
+
+### Technical Details
+- Implemented URL validation service:
+  ```typescript
+  interface ValidationResult {
+    valid: boolean;
+    url: string;
+  }
+
+  // URL validation with comprehensive security checks
+  const validateURL = async (url: string): Promise<ValidationResult>
+  ```
+- Added content-type verification:
+  ```typescript
+  // Content verification using HEAD request
+  const response = await fetch(url, {
+    method: 'HEAD',
+    headers: { Accept: 'image/*' }
+  });
+  ```
+
+### Developer Notes
+- URL validation follows security best practices
+- Content-type verification prevents malicious file uploads
+- Error handling provides clear feedback
+- Security measures follow industry standards
+
 ## [v5.0.0] — 2025-07-16T14:18:05Z
 
 ### Added

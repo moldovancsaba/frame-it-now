@@ -50,6 +50,10 @@ export const useCamera = ({ facingMode = "user", dimensions }: UseCameraOptions 
   };
 
   const startCamera = async () => {
+    // If already initialized and ready, don't reinitialize
+    if (initializationStatus.state === "ready" && streamRef.current && videoRef.current?.srcObject) {
+      return;
+    }
     try {
       setInitializationStatus({ state: "initializing" });
       stopCamera();
@@ -87,8 +91,17 @@ export const useCamera = ({ facingMode = "user", dimensions }: UseCameraOptions 
   };
 
   useEffect(() => {
-    startCamera();
+    let mounted = true;
+    
+    const initCamera = async () => {
+      if (!mounted) return;
+      await startCamera();
+    };
+
+    initCamera();
+
     return () => {
+      mounted = false;
       stopCamera();
       setInitializationStatus({ state: "initializing" });
     };

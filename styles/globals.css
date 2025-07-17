@@ -28,27 +28,27 @@
     @apply overflow-hidden;
     @apply gap-4;
     @apply p-4;
-    max-height: 100vh;
+    position: fixed; /* Ensure full viewport coverage */
+    inset: 0;
   }
 
-  .preview-container {
+  .preview-container,
+  .photo-container {
     @apply relative overflow-hidden;
     @apply flex items-center justify-center;
-    @apply aspect-square;
-    max-height: calc(100vh - 120px); /* Account for padding and buttons */
-    height: auto;
-    width: auto;
-    min-width: 0;
-    min-height: 0;
+    margin: auto;
+    position: relative;
+    display: grid;
+    place-items: center;
   }
 
   .video-preview {
-    @apply absolute inset-0;
-    @apply w-full h-full;
-    @apply object-cover;
-    @apply rounded-none;
+    position: absolute;
+    inset: 0;
     transform: scaleX(-1);
     z-index: 10;
+    @apply object-cover;
+    @apply w-full h-full;
   }
 
   .video-preview-hidden {
@@ -62,31 +62,72 @@
   }
 
   .photo-frame {
-    @apply absolute inset-0;
-    @apply w-full h-full;
+    position: absolute;
+    inset: 0;
     @apply opacity-80;
     @apply pointer-events-none;
+    @apply w-full h-full;
     z-index: 30;
   }
 
   .photo-output {
     @apply w-full h-full;
+    @apply object-cover;
+    position: absolute;
+    inset: 0;
+  }
+
+  .photo-frame-overlay {
+    @apply absolute inset-0;
+    @apply w-full h-full;
     @apply object-contain;
+    pointer-events: none;
+    z-index: 30;
+  }
+
+  .photo-frame-hidden {
+    @apply opacity-0;
   }
 
   /* Button layouts */
   .button-container {
-    @apply fixed bottom-4 left-1/2;
+    @apply fixed left-1/2 bottom-4;
     @apply flex justify-center items-center;
     @apply gap-4;
     transform: translateX(-50%);
     z-index: 40;
     min-height: 52px;
+    width: auto;
+    max-width: 90vw;
+    @apply px-4; /* Add horizontal padding */
+  }
+
+  .btn {
+    @apply bg-white/90 text-gray-900 rounded-lg;
+    @apply font-semibold text-base;
+    @apply hover:bg-white transition-all duration-200;
+    @apply flex items-center justify-center;
+    @apply flex-shrink-0; /* Prevent button shrinking */
+    height: 44px;
+    padding: 0 1.5rem;
+    min-width: 120px; /* Ensure consistent button width */
+    white-space: nowrap;
+    backdrop-filter: blur(4px);
+  }
+
+  .btn-disabled {
+    @apply opacity-50 cursor-not-allowed;
   }
 
   @media (orientation: landscape) {
     .camera-container {
-      @apply pr-[180px]; /* Account for button width + padding */
+      @apply pr-[180px];
+      @apply pb-0; /* Remove bottom padding in landscape */
+    }
+    
+    .preview-container,
+    .photo-container {
+      margin: 0 auto;
     }
 
     .button-container {
@@ -98,27 +139,9 @@
       bottom: auto;
       width: 160px;
     }
-
-    .btn {
-      @apply w-auto;
-    }
   }
 
   /* Button style */
-  .btn {
-    @apply bg-white/90 text-gray-900 rounded-lg;
-    @apply font-semibold text-base;
-    @apply hover:bg-white transition-all duration-200;
-    @apply flex items-center justify-center;
-    height: 44px;
-    padding: 0 1.5rem;
-    white-space: nowrap;
-    backdrop-filter: blur(4px);
-  }
-
-  .btn-disabled {
-    @apply opacity-50 cursor-not-allowed;
-  }
 
   /* Loading states */
   .loading-container {
