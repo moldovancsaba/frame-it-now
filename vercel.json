@@ -1,0 +1,16 @@
+{
+  "env": {
+    "MONGODB_URI": "@mongodb_uri",
+    "MONGODB_DB": "frameit",
+    "NEXT_PUBLIC_IMGBB_API_KEY": "@imgbb_api_key",
+    "IMGBB_API_URL": "https://api.imgbb.com/1/upload"
+  },
+  "build": {
+    "env": {
+      "MONGODB_URI": "@mongodb_uri",
+      "MONGODB_DB": "frameit",
+      "NEXT_PUBLIC_IMGBB_API_KEY": "@imgbb_api_key",
+      "IMGBB_API_URL": "https://api.imgbb.com/1/upload"
+    }
+  }
+}
