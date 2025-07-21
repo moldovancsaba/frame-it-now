@@ -6,6 +6,10 @@ import { MessageOverlay } from './components/MessageOverlay';
 import { useLayersStore } from './store/layers';
 import type { Layer, ITextLayer, IImageLayer } from './types/layers';
 
+function compareLayerOrder(a: Layer, b: Layer): number {
+  return a.order - b.order;
+}
+
 function CameraLayer(): JSX.Element {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [error, setError] = useState<string | null>(null);
@@ -13,27 +17,33 @@ function CameraLayer(): JSX.Element {
 
   useEffect(() => {
     let stream: MediaStream | null = null;
-    console.log('Initializing camera...');
+    // Log camera initialization
     setIsLoading(true);
     
-    async function initializeCamera(): Promise<void> {
+    const initializeCamera = async (): Promise<void> => {
       try {
         const mediaStream = await navigator.mediaDevices.getUserMedia({ 
           video: true
         });
-        console.log('Camera access granted.');
+        // Camera access successfully granted
         if (videoRef.current && mediaStream) {
-          console.log('Video element is ready.');
+          // Video element initialized and ready
           stream = mediaStream;
           videoRef.current.srcObject = mediaStream;
-          videoRef.current.onloadedmetadata = () => {
-            videoRef.current?.play();
-            console.log('Camera feed is live.');
+          const handleMetadataLoaded = async (): Promise<void> => {
+            try {
+              await videoRef.current?.play();
+              // Camera feed initialized and streaming
+            } catch (playError) {
+              setError('Failed to start video playback');
+            }
           };
+          videoRef.current.onloadedmetadata = handleMetadataLoaded;
         }
         setIsLoading(false);
-      } catch (error) {
-        console.error('Camera access error:', error);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_error) {
+        // Camera access failed
         setError('Failed to access camera. Please check permissions and try again.');
         setIsLoading(false);
       }
@@ -41,7 +51,14 @@ function CameraLayer(): JSX.Element {
 
     initializeCamera();
 
-  return (): void => stream?.getTracks().forEach(track => track.stop());
+    return (): void => {
+      if (stream) {
+        const tracks = stream.getTracks();
+        tracks.forEach((track): void => {
+          track.stop();
+        });
+      }
+    };
   }, []);
 
   if (error) {
@@ -57,12 +74,14 @@ function CameraLayer(): JSX.Element {
       ref={videoRef} 
       autoPlay 
       playsInline 
+      muted
       style={{ 
         position: 'absolute',
         width: '100%',
         height: '100vh',
         objectFit: 'cover',
-        zIndex: 0
+        zIndex: 0,
+        transform: 'scaleX(-1)' // Mirror the video horizontally
       }} 
     />
   );
@@ -147,7 +166,7 @@ export default function Page(): JSX.Element {
     }}>
       {layers
         .filter(layer => layer.visible)
-        .sort((a, b) => a.order - b.order)
+        .sort(compareLayerOrder)
         .map(layer => (
           <LayerComponent key={layer.id} layer={layer} />
         ))}

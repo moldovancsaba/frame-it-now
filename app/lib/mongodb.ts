@@ -1,32 +1,55 @@
 import { MongoClient } from 'mongodb';
+import { configLoader } from './config/loader';
 
-if (!process.env.MONGODB_URI) {
-  throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
-}
+// Get MongoDB configuration from centralized config
+/**
+ * MongoDB connection configuration and client initialization
+ * Handles configuration loading and connection management
+ */
 
-if (!process.env.MONGODB_DB) {
-  console.warn('Warning: MONGODB_DB not set, using default database name');
-}
+// Initialize MongoDB client promise
+const initializeClient = async (): Promise<MongoClient> => {
+  const config = await configLoader.loadConfig();
+  const { uri, options } = config.mongodb;
 
-const uri = process.env.MONGODB_URI;
-const options = {};
+  // Create new client instance
+  const client = new MongoClient(uri, options);
+  return client;
+};
 
-let client: MongoClient;
-let clientPromise: Promise<MongoClient>;
-
-if (process.env.NODE_ENV === 'development') {
-  const globalWithMongo = global as typeof globalThis & {
-    _mongoClientPromise?: Promise<MongoClient>;
-  };
-
-  if (!globalWithMongo._mongoClientPromise) {
-    client = new MongoClient(uri, options);
-    globalWithMongo._mongoClientPromise = client.connect();
+// Initialize connection with retry logic
+const connectWithRetry = async (client: MongoClient, retries = 3, delay = 1000): Promise<MongoClient> => {
+  try {
+    await client.connect();
+    return client;
+  } catch (error) {
+    if (retries > 0) {
+      console.warn(`MongoDB connection failed, retrying... (${retries} attempts left)`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return connectWithRetry(client, retries - 1, delay * 2);
+    }
+    throw error;
   }
-  clientPromise = globalWithMongo._mongoClientPromise;
-} else {
-  client = new MongoClient(uri, options);
-  clientPromise = client.connect();
-}
+};
+
+// Handle client initialization based on environment
+const clientPromise: Promise<MongoClient> = (async (): Promise<MongoClient> => {
+  if (process.env.NODE_ENV === 'development') {
+    // In development, reuse existing connection if available
+    const globalWithMongo = global as typeof globalThis & {
+      _mongoClientPromise?: Promise<MongoClient>;
+    };
+
+    if (!globalWithMongo._mongoClientPromise) {
+      const client = await initializeClient();
+      globalWithMongo._mongoClientPromise = connectWithRetry(client);
+    }
+    return globalWithMongo._mongoClientPromise;
+  } else {
+    // In production, create new connection
+    const client = await initializeClient();
+    return connectWithRetry(client);
+  }
+})();
 
 export default clientPromise;

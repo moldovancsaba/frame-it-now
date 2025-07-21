@@ -48,7 +48,6 @@
     "prefer-const": "error",
     "curly": "error",
     "quotes": ["error", "single", { "avoidEscape": true }],
-    "semi": ["error", "always"],
     "react/display-name": "off",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn"

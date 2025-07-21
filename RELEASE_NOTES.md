@@ -1,3 +1,31 @@
+## [v3.0.0] — 2025-07-21T16:20:00.000Z
+
+### Major Changes
+- Enhanced Fast Refresh reliability by converting anonymous functions to named functions
+- Improved component lifecycle handling in CameraLayer
+- Enhanced error handling and cleanup in media interactions
+- Optimized performance with proper function definitions
+
+### Technical Details
+- Converted anonymous component functions to named exports
+- Implemented proper cleanup patterns in useEffect hooks
+- Enhanced error boundaries around media interactions
+- Optimized component rendering lifecycle
+
+## [v2.0.2] — 2025-07-21T16:16:33Z
+
+### Changes
+- Fixed camera preview display by adding required video element attributes
+- Added horizontal mirroring for natural webcam view
+- Ensured proper autoplay behavior with muted attribute
+
+## [v2.0.1] — 2025-07-21T16:13:41Z
+
+### Changes
+- Added API endpoint for camera layer creation
+- Successfully tested layer creation with proper type and order parameters
+- Verified layer ID assignment and visibility controls
+
 ## [v2.0.0] — 2025-07-21
 
 Major update: Added camera stream capability

@@ -1,6 +1,6 @@
 # Frame-It-Now Architecture
 
-## Version 1.0.0
+## Version 3.0.0
 
 ### Core Components
 

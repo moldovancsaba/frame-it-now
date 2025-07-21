@@ -2,6 +2,12 @@
 
 ## Frontend
 
+### Component Optimization (2025-07-21)
+- Named function components provide better debugging and Fast Refresh support
+- Proper cleanup in useEffect prevents memory leaks and improves stability
+- Structured error handling in media interactions enhances reliability
+- Clear function definitions improve code maintainability and performance
+
 ### Camera Update (2025-07-21)
 - User media permissions must be clearly requested
 - Direct stream assignment can simplify video playback

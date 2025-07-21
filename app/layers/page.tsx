@@ -17,6 +17,26 @@ export default function LayersPage(): JSX.Element {
   } = useLayersStore();
   const [newLayerType, setNewLayerType] = useState<LayerType>('text');
 
+  const handleLayerTypeChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
+    setNewLayerType(e.target.value as LayerType);
+  };
+
+  const handleToggleVisibility = (id: string): void => {
+    toggleLayerVisibility(id);
+  };
+
+  const handleMoveUp = (id: string, currentOrder: number): void => {
+    reorderLayer(id, Math.max(0, currentOrder - 1));
+  };
+
+  const handleMoveDown = (id: string, currentOrder: number): void => {
+    reorderLayer(id, currentOrder + 1);
+  };
+
+  const handleRemove = (id: string): void => {
+    removeLayer(id);
+  };
+
   useEffect(() => {
     fetchLayers();
   }, [fetchLayers]);
@@ -110,7 +130,7 @@ export default function LayersPage(): JSX.Element {
             border: '1px solid #ccc'
           }}
           value={newLayerType} 
-          onChange={(e) => setNewLayerType(e.target.value as LayerType)}
+          onChange={handleLayerTypeChange}
         >
           <option value="text">Text</option>
           <option value="image">Image</option>
@@ -143,7 +163,7 @@ export default function LayersPage(): JSX.Element {
           }}>
             <span style={{ minWidth: '80px' }}>{layer.type}</span>
             <button 
-              onClick={() => toggleLayerVisibility(layer.id)}
+              onClick={() => handleToggleVisibility(layer.id)}
               style={{
                 padding: '4px 8px',
                 backgroundColor: layer.visible ? '#28a745' : '#6c757d',
@@ -157,7 +177,7 @@ export default function LayersPage(): JSX.Element {
               {layer.visible ? 'Hide' : 'Show'}
             </button>
             <button 
-              onClick={() => reorderLayer(layer.id, Math.max(0, layer.order - 1))}
+              onClick={() => handleMoveUp(layer.id, layer.order)}
               disabled={layer.order === 0}
               style={{
                 padding: '4px 8px',
@@ -172,7 +192,7 @@ export default function LayersPage(): JSX.Element {
               ↑
             </button>
             <button 
-              onClick={() => reorderLayer(layer.id, layer.order + 1)}
+              onClick={() => handleMoveDown(layer.id, layer.order)}
               disabled={layer.order === layers.length - 1}
               style={{
                 padding: '4px 8px',
@@ -187,7 +207,7 @@ export default function LayersPage(): JSX.Element {
               ↓
             </button>
             <button 
-              onClick={() => removeLayer(layer.id)}
+              onClick={() => handleRemove(layer.id)}
               style={{
                 padding: '4px 8px',
                 backgroundColor: '#dc3545',

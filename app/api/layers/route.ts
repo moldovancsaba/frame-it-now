@@ -12,7 +12,8 @@ export async function GET(): Promise<NextResponse> {
       throw new Error('Failed to connect to MongoDB Atlas');
     }
     
-    const db = client.db('frameit');
+    const dbName = process.env.MONGODB_DB || 'frameit';
+    const db = client.db(dbName);
     
     const layers = await db.collection('layers').find({}).toArray();
     // Convert MongoDB _id to string id for frontend
@@ -23,10 +24,17 @@ export async function GET(): Promise<NextResponse> {
     }));
     return NextResponse.json(formattedLayers);
   } catch (error) {
-    console.error('Database Error:', error instanceof Error ? error.message : error);
+    // Enhanced error logging
+    console.error('Database Error:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : '',
+      error
+    });
+    
     return NextResponse.json({ 
       error: 'Failed to fetch layers',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
     }, { status: 500 });
   }
 }
@@ -34,7 +42,8 @@ export async function GET(): Promise<NextResponse> {
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const client = await clientPromise;
-    const db = client.db('frameit');
+    const dbName = process.env.MONGODB_DB || 'frameit';
+    const db = client.db(dbName);
     const data = await request.json();
 
     let layer = data as NewLayer;
@@ -63,7 +72,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 export async function PUT(request: NextRequest): Promise<NextResponse> {
   try {
     const client = await clientPromise;
-    const db = client.db('frameit');
+    const dbName = process.env.MONGODB_DB || 'frameit';
+    const db = client.db(dbName);
     const data = await request.json();
     const { id, ...updateData } = data;
 
@@ -97,7 +107,8 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
 export async function DELETE(request: NextRequest): Promise<NextResponse> {
   try {
     const client = await clientPromise;
-    const db = client.db('frameit');
+    const dbName = process.env.MONGODB_DB || 'frameit';
+    const db = client.db(dbName);
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 
