@@ -11,10 +11,14 @@
  */
 export interface IMongoDBOptions {
   maxPoolSize: number;           // Maximum number of connections in the connection pool
+  minPoolSize?: number;         // Minimum number of connections in the connection pool
   serverSelectionTimeoutMS: number;  // How long to wait for server selection before timing out
   socketTimeoutMS: number;       // How long to wait for socket operations before timing out
+  connectTimeoutMS?: number;    // How long to wait for initial connection before timing out
   replicaSet?: string;          // Optional replica set name for MongoDB cluster
   retryWrites: boolean;         // Whether to retry write operations on failure
+  keepAlive?: boolean;         // Whether to use TCP keepAlive on the socket
+  autoReconnect?: boolean;     // Whether to automatically reconnect on connection failure
 }
 
 /**
