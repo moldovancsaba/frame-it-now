@@ -34,7 +34,7 @@ function CameraLayer(): JSX.Element {
             try {
               await videoRef.current?.play();
               // Camera feed initialized and streaming
-            } catch (playError) {
+            } catch (_error) {
               setError('Failed to start video playback');
             }
           };
