@@ -12,8 +12,18 @@ const initializeClient = async (): Promise<MongoClient> => {
   const config = await configLoader.loadConfig();
   const { uri, options } = config.mongodb;
 
-  // Create new client instance
-  const client = new MongoClient(uri, options);
+  // Create new client instance with serverless-optimized options
+  const client = new MongoClient(uri, {
+    ...options,
+    // Force serverless mode for better connection handling
+    maxPoolSize: 1,
+    minPoolSize: 0,
+    keepAlive: false,
+    autoReconnect: false,
+    socketTimeoutMS: 30000,
+    connectTimeoutMS: 10000,
+    serverSelectionTimeoutMS: 5000
+  });
   return client;
 };
 

@@ -119,10 +119,13 @@ export const defaultConfig: Partial<IConfig> = {
     uri: '',  // Will be overridden by environment variable
     dbName: 'frame-it-now',
     options: {
-      maxPoolSize: 10,
+      maxPoolSize: 1, // Reduced for serverless environment
       serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
+      socketTimeoutMS: 30000,
+      connectTimeoutMS: 10000,
       retryWrites: true,
+      keepAlive: false, // Disabled for serverless
+      autoReconnect: false // Disabled for serverless
     }
   },
   imgbb: {

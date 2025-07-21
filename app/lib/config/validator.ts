@@ -24,12 +24,7 @@ const baseConfig: IEnvConfig = {
     MONGODB_URI: {
       required: true,
       validator: (value) => {
-        try {
-          new URL(value);
-          return true;
-        } catch {
-          return false;
-        }
+        return value.startsWith('mongodb+srv://') || value.startsWith('mongodb://');
       },
       errorMessage: 'MONGODB_URI must be a valid URL',
     },
