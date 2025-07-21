@@ -1,0 +1,119 @@
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import clientPromise from '../../lib/mongodb';
+import { ObjectId } from 'mongodb';
+import { uploadImage } from '../../lib/imgbb';
+import type { NewLayer } from '../../types/layers';
+
+export async function GET(): Promise<NextResponse> {
+  try {
+    const client = await clientPromise;
+    if (!client) {
+      throw new Error('Failed to connect to MongoDB Atlas');
+    }
+    
+    const db = client.db('frameit');
+    
+    const layers = await db.collection('layers').find({}).toArray();
+    // Convert MongoDB _id to string id for frontend
+    const formattedLayers = layers.map(layer => ({
+      ...layer,
+      id: layer._id.toString(),
+      _id: undefined
+    }));
+    return NextResponse.json(formattedLayers);
+  } catch (error) {
+    console.error('Database Error:', error instanceof Error ? error.message : error);
+    return NextResponse.json({ 
+      error: 'Failed to fetch layers',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
+  }
+}
+
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  try {
+    const client = await clientPromise;
+    const db = client.db('frameit');
+    const data = await request.json();
+
+    let layer = data as NewLayer;
+
+    // If it's an image layer, handle the image upload
+    if (layer.type === 'image' && layer.url.startsWith('data:')) {
+      try {
+        const imageUrl = await uploadImage(layer.url);
+        layer = { ...layer, url: imageUrl };
+      } catch (error) {
+        console.error('Image Upload Error:', error);
+        return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 });
+      }
+    }
+
+    const result = await db.collection('layers').insertOne(layer);
+    const insertedLayer = { ...layer, id: result.insertedId.toString() };
+
+    return NextResponse.json(insertedLayer);
+  } catch (error) {
+    console.error('Database Error:', error);
+    return NextResponse.json({ error: 'Failed to create layer' }, { status: 500 });
+  }
+}
+
+export async function PUT(request: NextRequest): Promise<NextResponse> {
+  try {
+    const client = await clientPromise;
+    const db = client.db('frameit');
+    const data = await request.json();
+    const { id, ...updateData } = data;
+
+    // If updating an image layer with a new image
+    if (updateData.type === 'image' && updateData.url?.startsWith('data:')) {
+      try {
+        const imageUrl = await uploadImage(updateData.url);
+        updateData.url = imageUrl;
+      } catch (error) {
+        console.error('Image Upload Error:', error);
+        return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 });
+      }
+    }
+
+    const result = await db.collection('layers').updateOne(
+      { _id: new ObjectId(id) },
+      { $set: updateData }
+    );
+
+    if (result.modifiedCount === 0) {
+      return NextResponse.json({ error: 'Layer not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Database Error:', error);
+    return NextResponse.json({ error: 'Failed to update layer' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest): Promise<NextResponse> {
+  try {
+    const client = await clientPromise;
+    const db = client.db('frameit');
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ error: 'Layer ID is required' }, { status: 400 });
+    }
+
+    const result = await db.collection('layers').deleteOne({ _id: new ObjectId(id) });
+
+    if (result.deletedCount === 0) {
+      return NextResponse.json({ error: 'Layer not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Database Error:', error);
+    return NextResponse.json({ error: 'Failed to delete layer' }, { status: 500 });
+  }
+}

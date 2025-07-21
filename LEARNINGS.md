@@ -2,6 +2,12 @@
 
 ## Frontend
 
+### Camera Update (2025-07-21)
+- User media permissions must be clearly requested
+- Direct stream assignment can simplify video playback
+- onloadedmetadata ensures media is ready
+- Detailed logging aids in troubleshooting permissions and setup
+
 ### Camera Implementation (2025-07-20)
 - Native MediaDevices API provides reliable camera access
 - useEffect cleanup is crucial for proper resource management

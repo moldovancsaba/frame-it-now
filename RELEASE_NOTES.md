@@ -1,3 +1,14 @@
+## [v2.0.0] — 2025-07-21
+
+Major update: Added camera stream capability
+
+### Changes
+- Implemented camera layer with video streaming
+- Ensured user permissions prompt for camera access
+- Fixed video element initialization and playback issues
+- Optimized loading and error states
+
+
 ## [v1.0.0] — 2025-07-20
 
 Major update: Complete refactor to minimal camera preview functionality
