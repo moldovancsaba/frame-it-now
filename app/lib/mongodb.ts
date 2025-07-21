@@ -18,11 +18,12 @@ const initializeClient = async (): Promise<MongoClient> => {
     // Force serverless mode for better connection handling
     maxPoolSize: 1,
     minPoolSize: 0,
-    keepAlive: false,
-    autoReconnect: false,
     socketTimeoutMS: 30000,
     connectTimeoutMS: 10000,
-    serverSelectionTimeoutMS: 5000
+    serverSelectionTimeoutMS: 5000,
+    // MongoDB Node.js driver specific options
+    keepAliveInitialDelay: 0, // Disable keepAlive for serverless
+    family: 4 // Force IPv4 (more reliable in some serverless environments)
   });
   return client;
 };

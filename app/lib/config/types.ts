@@ -17,8 +17,8 @@ export interface IMongoDBOptions {
   connectTimeoutMS?: number;    // How long to wait for initial connection before timing out
   replicaSet?: string;          // Optional replica set name for MongoDB cluster
   retryWrites: boolean;         // Whether to retry write operations on failure
-  keepAlive?: boolean;         // Whether to use TCP keepAlive on the socket
-  autoReconnect?: boolean;     // Whether to automatically reconnect on connection failure
+  keepAliveInitialDelay?: number; // Initial delay before starting keepalive on the TCP socket
+  family?: number;             // IP address family version to use (4 or 6)
 }
 
 /**
@@ -128,8 +128,8 @@ export const defaultConfig: Partial<IConfig> = {
       socketTimeoutMS: 30000,
       connectTimeoutMS: 10000,
       retryWrites: true,
-      keepAlive: false, // Disabled for serverless
-      autoReconnect: false // Disabled for serverless
+      keepAliveInitialDelay: 0, // Disable keepAlive for serverless
+      family: 4 // Force IPv4 (more reliable in some serverless environments)
     }
   },
   imgbb: {
