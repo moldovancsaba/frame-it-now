@@ -79,12 +79,61 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 }
 
 export async function PUT(request: NextRequest): Promise<NextResponse> {
+  const client = await clientPromise;
+  const dbName = process.env.MONGODB_DB || 'frameit';
+  const db = client.db(dbName);
+
   try {
-    const client = await clientPromise;
-    const dbName = process.env.MONGODB_DB || 'frameit';
-    const db = client.db(dbName);
     const data = await request.json();
-    const { id, ...updateData } = data;
+    const { id, order, ...updateData } = data;
+
+    // If updating order, handle reordering logic
+    if (typeof order === 'number') {
+      const collection = db.collection('layers');
+      const layer = await collection.findOne({ _id: new ObjectId(id) });
+
+      if (!layer) {
+        return NextResponse.json({ error: 'Layer not found' }, { status: 404 });
+      }
+
+      const currentOrder = layer.order;
+
+      // Update orders of affected layers
+      if (currentOrder < order) {
+        // Moving down: decrease order of layers in between
+        await collection.updateMany(
+          { 
+            order: { $gt: currentOrder, $lte: order },
+            _id: { $ne: new ObjectId(id) }
+          },
+          { $inc: { order: -1 } }
+        );
+      } else if (currentOrder > order) {
+        // Moving up: increase order of layers in between
+        await collection.updateMany(
+          { 
+            order: { $gte: order, $lt: currentOrder },
+            _id: { $ne: new ObjectId(id) }
+          },
+          { $inc: { order: 1 } }
+        );
+      }
+
+      // Update the target layer's order
+      const result = await collection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { order } }
+      );
+
+      if (result.modifiedCount === 0) {
+        return NextResponse.json({ error: 'Failed to update layer order' }, { status: 500 });
+      }
+
+      return NextResponse.json({ success: true });
+    }
+
+    // Handle non-order updates
+  try {
 
     // If updating an image layer with a new image
     if (updateData.type === 'image' && updateData.url?.startsWith('data:')) {

@@ -118,25 +118,44 @@ export const useLayersStore = create<ILayersStore>((set, get) => ({
   reorderLayer: async (id: string, newOrder: number): Promise<void> => {
     set({ isLoading: true, error: null });
     try {
-      const layer = get().layers.find(l => l.id === id);
+      const currentLayers = get().layers;
+      const layer = currentLayers.find(l => l.id === id);
       if (!layer) {
         throw new Error('Layer not found');
       }
 
-      await updateLayerById(id, { order: newOrder });
-      set((state) => ({
-        layers: state.layers.map(layer => {
-          if (layer.id === id) {
-            return { ...layer, order: newOrder };
+      // Calculate the new order for all affected layers
+      const reorderedLayers = currentLayers
+        .map(l => {
+          if (l.id === id) {
+            return { ...l, order: newOrder };
           }
-          if (layer.order >= newOrder) {
-            return { ...layer, order: layer.order + 1 };
+          // If moving layer down
+          if (layer.order < newOrder) {
+            if (l.order > layer.order && l.order <= newOrder) {
+              return { ...l, order: l.order - 1 };
+            }
           }
-          return layer;
-        }).sort((a, b) => a.order - b.order),
-        isLoading: false
-      }));
-    } catch {
+          // If moving layer up
+          else if (layer.order > newOrder) {
+            if (l.order >= newOrder && l.order < layer.order) {
+              return { ...l, order: l.order + 1 };
+            }
+          }
+          return l;
+        })
+        .sort((a, b) => a.order - b.order);
+
+      // Update all affected layers in the database
+      for (const l of reorderedLayers) {
+        if (l.order !== currentLayers.find(cl => cl.id === l.id)?.order) {
+          await updateLayerById(l.id, { order: l.order });
+        }
+      }
+
+      set({ layers: reorderedLayers, isLoading: false });
+    } catch (error) {
+      console.error('Reorder error:', error);
       set({ error: 'Failed to reorder layer', isLoading: false });
     }
   },
