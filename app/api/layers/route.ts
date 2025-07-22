@@ -133,8 +133,6 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
     }
 
     // Handle non-order updates
-  try {
-
     // If updating an image layer with a new image
     if (updateData.type === 'image' && updateData.url?.startsWith('data:')) {
       try {
@@ -156,10 +154,6 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('Database Error:', error);
-    return NextResponse.json({ error: 'Failed to update layer' }, { status: 500 });
-  }
 }
 
 export async function DELETE(request: NextRequest): Promise<NextResponse> {
