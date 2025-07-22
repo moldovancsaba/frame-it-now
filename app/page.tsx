@@ -22,8 +22,22 @@ function CameraLayer(): JSX.Element {
     
     const initializeCamera = async (): Promise<void> => {
       try {
+        // Check if we're in a secure context
+        if (!window.isSecureContext) {
+          throw new Error('Camera access requires HTTPS');
+        }
+
+        // Check if mediaDevices API is available
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          throw new Error('Camera API not available');
+        }
+
         const mediaStream = await navigator.mediaDevices.getUserMedia({ 
-          video: true
+          video: {
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+            facingMode: 'user'
+          }
         });
         // Camera access successfully granted
         if (videoRef.current && mediaStream) {
@@ -43,9 +57,12 @@ function CameraLayer(): JSX.Element {
         }
         setIsLoading(false);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (_error) {
+      } catch (error) {
         // Camera access failed
-        setError('Failed to access camera. Please check permissions and try again.');
+        console.error('Camera initialization error:', error);
+        setError(
+          `Failed to access camera: ${error instanceof Error ? error.message : 'Please check permissions and try again.'}`
+        );
         setIsLoading(false);
       }
     }
