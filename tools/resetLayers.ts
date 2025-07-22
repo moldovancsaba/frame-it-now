@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 
 const MONGODB_URI = process.env.MONGODB_URI as string;
 if (!MONGODB_URI) {
@@ -24,6 +24,7 @@ async function resetLayers() {
     
     // Insert default camera layer
     const cameraLayer = {
+      _id: new ObjectId(),  // Explicitly set MongoDB _id
       type: 'camera',
       order: 0,
       visible: true
@@ -38,11 +39,11 @@ async function resetLayers() {
       order: 1,
       visible: true,
       content: 'New Text',
-      fontSize: 16,
-      color: '#000000',
+      fontSize: 24,
+      color: '#ffffff',
       position: {
-        x: 100,
-        y: 100
+        x: 50,
+        y: 50
       }
     };
     
