@@ -1,7 +1,15 @@
 import { MongoClient } from 'mongodb';
-import { Layer } from '../app/types/layers';
+interface Layer {
+  id: string;
+  type: 'camera' | 'text' | 'image';
+  order: number;
+  visible: boolean;
+}
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://moldovancsaba:w9fLwkViA3wyXRj@frameit-cluster.a7snj6n.mongodb.net/?retryWrites=true&w=majority&appName=frameit-cluster';
+const MONGODB_URI = process.env.MONGODB_URI;
+if (!MONGODB_URI) {
+  throw new Error('MONGODB_URI environment variable is required');
+}
 const DB_NAME = process.env.MONGODB_DB || 'frameit';
 
 async function initDefaultLayers() {

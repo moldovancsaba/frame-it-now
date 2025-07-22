@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "init-layers": "ts-node scripts/initDefaultLayers.ts"
+    "init-layers": "ts-node scripts/initDefaultLayers.ts",
+    "check-layers": "ts-node scripts/checkLayers.ts",
+    "reset-layers": "ts-node scripts/resetLayers.ts"
   },
   "dependencies": {
     "axios": "^1.10.0",

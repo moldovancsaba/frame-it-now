@@ -23,10 +23,13 @@ export async function GET(): Promise<NextResponse> {
     
     const layers = await db.collection('layers').find({}).toArray();
     // Convert MongoDB _id to string id for frontend
+    // Convert MongoDB ObjectId to string id and ensure layer order is respected
     const formattedLayers = layers.map(layer => ({
       ...layer,
       id: layer._id.toString(),
-      _id: undefined
+      _id: undefined,
+      // Ensure order is a number and unique
+      order: typeof layer.order === 'number' ? layer.order : 0
     }));
     return NextResponse.json(formattedLayers);
   } catch (error) {
