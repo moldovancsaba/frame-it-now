@@ -6,7 +6,7 @@ interface Layer {
   visible: boolean;
 }
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI as string;
 if (!MONGODB_URI) {
   throw new Error('MONGODB_URI environment variable is required');
 }
