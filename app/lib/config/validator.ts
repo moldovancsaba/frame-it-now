@@ -115,7 +115,6 @@ const result: IValidationResult = {
  * @throws Error with detailed validation messages if validation fails
  */
 export function validateEnvOrThrow(): void {
-  console.log('Validating environment variables...');
   const result = validateEnv();
   
   if (!result.isValid) {
@@ -124,8 +123,6 @@ export function validateEnvOrThrow(): void {
       ...result.errors.map(err => `  - ${err}`),
     ].join('\n');
     
-    console.error('Validation errors:', result.errors);
     throw new Error(errorMessage);
   }
-  console.log('Environment variables validated successfully.');
 }

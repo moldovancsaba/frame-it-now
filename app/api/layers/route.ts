@@ -7,19 +7,16 @@ import type { NewLayer } from '../../types/layers';
 
 export async function GET(): Promise<NextResponse> {
   try {
-    console.log('Attempting to connect to MongoDB...');
     const client = await clientPromise;
     if (!client) {
       throw new Error('Failed to connect to MongoDB Atlas');
     }
     
     const dbName = process.env.MONGODB_DB || 'frameit';
-    console.log(`Using database: ${dbName}`);
     const db = client.db(dbName);
     
     // Verify database connection
     await db.command({ ping: 1 });
-    console.log('Successfully connected to database');
     
     const layers = await db.collection('layers').find({}).toArray();
     // Convert MongoDB _id to string id for frontend
@@ -33,13 +30,6 @@ export async function GET(): Promise<NextResponse> {
     }));
     return NextResponse.json(formattedLayers);
   } catch (error) {
-    // Enhanced error logging
-    console.error('Database Error:', {
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : '',
-      error
-    });
-    
     return NextResponse.json({ 
       error: 'Failed to fetch layers',
       details: error instanceof Error ? error.message : 'Unknown error',
@@ -63,8 +53,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         const imageUrl = await uploadImage(layer.url);
         layer = { ...layer, url: imageUrl };
       } catch (error) {
-        console.error('Image Upload Error:', error);
-        return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 });
+        return NextResponse.json({ 
+          error: 'Failed to upload image',
+          details: error instanceof Error ? error.message : 'Unknown error'
+        }, { status: 500 });
       }
     }
 
@@ -73,8 +65,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json(insertedLayer);
   } catch (error) {
-    console.error('Database Error:', error);
-    return NextResponse.json({ error: 'Failed to create layer' }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Failed to create layer',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }
 
@@ -150,8 +144,10 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error updating layer:', error);
-    return NextResponse.json({ error: 'Failed to update layer' }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Failed to update layer',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }
 
@@ -175,7 +171,9 @@ export async function DELETE(request: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Database Error:', error);
-    return NextResponse.json({ error: 'Failed to delete layer' }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Failed to delete layer',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }

@@ -1,3 +1,44 @@
+## [v4.0.0] — 2025-07-22T17:05:20.000Z
+
+### Major Update
+- Fixed container scaling and aspect ratio issues.
+- Implemented ResponsiveScaler component for consistent display.
+- Removed errors related to black rectangles resizing improperly.
+
+### Technical Details
+- Switched to fixed and absolute positioning for better layout control.
+- Updated utility functions to ensure reliable scaling.
+
+### Usage Changes
+- Integrate ResponsiveScaler with content to handle aspect ratios.
+
+### Breaking Changes
+- Container and content must now respect new layout logic and structure.
+
+## [v3.1.0] — 2024-03-20T15:30:00.000Z
+
+### Added
+- Responsive frame scaling system
+- Dynamic viewport size handling
+- CSS transform-based optimization
+
+### Technical Details
+- Implemented ResponsiveScaler component for frame size management
+- Added viewport-based calculations for consistent display
+- Optimized rendering using CSS transform scaling
+
+### Usage Example
+```jsx
+<ResponsiveScaler>
+  <Frame width={500} height={300} />
+</ResponsiveScaler>
+```
+
+### Breaking Changes
+- Frame components must now be wrapped in ResponsiveScaler
+- Direct size manipulation via style props is deprecated
+- Viewport changes now trigger automatic rescaling
+
 ## [v3.0.0] — 2025-07-21T16:20:00.000Z
 
 ### Major Changes

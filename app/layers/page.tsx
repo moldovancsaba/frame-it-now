@@ -1,7 +1,8 @@
 'use client';
 
 import { useLayersStore } from '../store/layers';
-import type { LayerType } from '../types/layers';
+import { useCompositionStore } from '../store/composition';
+import type { LayerType, ScalingMode } from '../types/layers';
 import { useState, useEffect } from 'react';
 
 export default function LayersPage(): JSX.Element {
@@ -10,11 +11,24 @@ export default function LayersPage(): JSX.Element {
     addLayer, 
     removeLayer, 
     reorderLayer, 
-    toggleLayerVisibility, 
+    toggleLayerVisibility,
+    updateLayer, 
     fetchLayers,
     isLoading,
     error
   } = useLayersStore();
+
+  const { 
+    aspectRatio, 
+    setAspectRatio, 
+    fetchComposition,
+    isLoading: isCompositionLoading,
+    error: compositionError 
+  } = useCompositionStore();
+
+  useEffect(() => {
+    fetchComposition();
+  }, [fetchComposition]);
   const [newLayerType, setNewLayerType] = useState<LayerType>('text');
 
   const handleLayerTypeChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
@@ -23,6 +37,24 @@ export default function LayersPage(): JSX.Element {
 
   const handleToggleVisibility = (id: string): void => {
     toggleLayerVisibility(id);
+  };
+
+  const handleScalingChange = (id: string, scaling: ScalingMode): void => {
+    updateLayer(id, { scaling });
+  };
+
+  const handleAspectRatioChange = async (ratio: string): Promise<void> => {
+    if (ratio === 'custom') {
+      // Don't change anything when switching to custom, just enable custom inputs
+      return;
+    }
+    // For preset ratios, update both the store and disable custom inputs
+    const [width, height] = ratio.split(':').map(Number);
+    await setAspectRatio(width, height);
+  };
+
+  const handleCustomAspectRatioChange = async (width: number, height: number): Promise<void> => {
+    await setAspectRatio(width || 1, height || 1);
   };
 
   const handleMoveUp = (id: string, currentOrder: number): void => {
@@ -53,7 +85,7 @@ export default function LayersPage(): JSX.Element {
       case 'text': {
         const textLayer = {
           ...baseLayer,
-          type: 'text' as const,
+type: 'text' as const,
           content: 'New Text',
           fontSize: 16,
           color: '#000000',
@@ -66,10 +98,11 @@ export default function LayersPage(): JSX.Element {
       case 'image': {
         const imageLayer = {
           ...baseLayer,
-          type: 'image' as const,
+type: 'image' as const,
           url: '',
           position: { x: 0, y: 0 },
-          size: { width: 100, height: 100 }
+          size: { width: 100, height: 100 },
+          scaling: 'fill' as const
         };
         layer = imageLayer;
         break;
@@ -78,7 +111,8 @@ export default function LayersPage(): JSX.Element {
       case 'camera': {
         const cameraLayer = {
           ...baseLayer,
-          type: 'camera' as const
+          type: 'camera' as const,
+          scaling: 'fill' as const
         };
         layer = cameraLayer;
         break;
@@ -88,19 +122,19 @@ export default function LayersPage(): JSX.Element {
     addLayer(layer);
   };
 
-  if (isLoading) {
+  if (isLoading || isCompositionLoading) {
     return (
       <div style={{ 
         padding: '20px', 
         textAlign: 'center',
         color: '#666'
       }}>
-        Loading layers...
+        Loading...
       </div>
     );
   }
 
-  if (error) {
+  if (error || compositionError) {
     return (
       <div style={{ 
         padding: '20px', 
@@ -113,11 +147,70 @@ export default function LayersPage(): JSX.Element {
   }
 
   return (
-    <div style={{ 
+      <div style={{ 
       padding: '20px',
       maxWidth: '800px',
       margin: '0 auto'
     }}>
+      {/* Aspect Ratio Controls */}
+      <div style={{
+        marginBottom: '20px',
+        padding: '15px',
+        backgroundColor: '#f8f9fa',
+        borderRadius: '4px'
+      }}>
+        <h3 style={{ marginTop: 0, marginBottom: '10px' }}>Composition Settings</h3>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <label>Preset Ratios:</label>
+            <select
+              value={`${aspectRatio.width}:${aspectRatio.height}`}
+              onChange={(e) => handleAspectRatioChange(e.target.value)}
+              style={{
+                padding: '8px',
+                borderRadius: '4px',
+                border: '1px solid #ccc'
+              }}
+            >
+              <option value="16:9">16:9</option>
+              <option value="4:3">4:3</option>
+              <option value="1:1">1:1</option>
+              <option value="9:16">9:16</option>
+              <option value="3:4">3:4</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <label>Custom Ratio:</label>
+            <input
+              type="number"
+              value={aspectRatio.width}
+              onChange={(e) => handleCustomAspectRatioChange(parseInt(e.target.value), aspectRatio.height)}
+              min="1"
+              style={{
+                padding: '8px',
+                borderRadius: '4px',
+                border: '1px solid #ccc',
+                width: '70px'
+              }}
+            />
+            <span>:</span>
+            <input
+              type="number"
+              value={aspectRatio.height}
+              onChange={(e) => handleCustomAspectRatioChange(aspectRatio.width, parseInt(e.target.value))}
+              min="1"
+              style={{
+                padding: '8px',
+                borderRadius: '4px',
+                border: '1px solid #ccc',
+                width: '70px'
+              }}
+            />
+          </div>
+        </div>
+      </div>
       <div style={{
         marginBottom: '20px',
         display: 'flex',
@@ -161,7 +254,25 @@ export default function LayersPage(): JSX.Element {
             justifyContent: 'space-between',
             gap: '10px'
           }}>
-            <span style={{ minWidth: '80px' }}>{layer.type}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1 }}>
+              <span style={{ minWidth: '80px' }}>{layer.type}</span>
+              {(layer.type === 'image' || layer.type === 'camera') && (
+                <select
+                  value={layer.scaling || 'none'}
+                  onChange={(e) => handleScalingChange(layer.id, e.target.value as ScalingMode)}
+                  style={{
+                    padding: '4px',
+                    borderRadius: '4px',
+                    border: '1px solid #ccc',
+                    fontSize: '12px'
+                  }}
+                >
+                  <option value="fill">Fill</option>
+                  <option value="fit">Fit</option>
+                  <option value="none">Original</option>
+                </select>
+              )}
+            </div>
             <button 
               onClick={() => handleToggleVisibility(layer.id)}
               style={{

@@ -42,6 +42,18 @@ app/
 - Modern React patterns and hooks
 - Responsive design principles
 
+### Sizing and Optimization System
+- **Responsive Frame Scaling**: Dynamic size adjustment based on viewport
+- **Scale Optimization**: Efficient frame resizing using CSS transforms
+- **Viewport Handling**: Real-time response to viewport changes
+- **Performance Focus**: Optimized rendering through transform-based scaling
+
+### ResponsiveScaler Component
+- Located in `components/ResponsiveScaler`
+- Handles dynamic frame size calculations
+- Implements CSS transform-based scaling
+- Manages viewport-based adjustments
+
 ## Component Structure
 ```
 src/

@@ -1,5 +1,7 @@
 export type LayerType = 'text' | 'image' | 'camera';
 
+export type ScalingMode = 'fill' | 'fit' | 'none';
+
 interface IPosition {
   x: number;
   y: number;
@@ -14,6 +16,7 @@ interface IBaseLayer {
   id?: string;
   order: number;
   visible: boolean;
+  scaling?: ScalingMode;
 }
 
 export interface ITextLayer extends IBaseLayer {
@@ -29,10 +32,12 @@ export interface IImageLayer extends IBaseLayer {
   url: string;
   position: IPosition;
   size: ISize;
+  scaling: ScalingMode;
 }
 
 export interface ICameraLayer extends IBaseLayer {
   type: 'camera';
+  scaling: ScalingMode;
 }
 
 export type Layer = (ITextLayer | IImageLayer | ICameraLayer) & { id: string };

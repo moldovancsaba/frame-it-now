@@ -1,0 +1,60 @@
+/* Scaler component styles with cross-browser support */
+
+.scalerContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Enable hardware acceleration */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000;
+  perspective: 1000;
+  -webkit-transform-origin: top left;
+  -moz-transform-origin: top left;
+  -ms-transform-origin: top left;
+  transform-origin: top left;
+  /* Smooth transition for transform changes */
+  -webkit-transition: -webkit-transform 0.3s ease;
+  -moz-transition: -moz-transform 0.3s ease;
+  -ms-transition: -ms-transform 0.3s ease;
+  transition: transform 0.3s ease;
+}
+
+/* Handle hover state with smooth scaling if needed */
+.scalerContainer:hover {
+  will-change: transform;
+}
+
+/* Class for active scaling state */
+.scaling {
+  will-change: transform;
+}
+
+/* Helper classes for different transform origins if needed */
+.originCenter {
+  -webkit-transform-origin: center;
+  -moz-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+.originTopRight {
+  -webkit-transform-origin: top right;
+  -moz-transform-origin: top right;
+  -ms-transform-origin: top right;
+  transform-origin: top right;
+}
+
+.originBottomLeft {
+  -webkit-transform-origin: bottom left;
+  -moz-transform-origin: bottom left;
+  -ms-transform-origin: bottom left;
+  transform-origin: bottom left;
+}
+
+.originBottomRight {
+  -webkit-transform-origin: bottom right;
+  -moz-transform-origin: bottom right;
+  -ms-transform-origin: bottom right;
+  transform-origin: bottom right;
+}

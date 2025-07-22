@@ -34,22 +34,17 @@ const connectWithRetry = async (client: MongoClient, retries = 3, delay = 1000):
     await client.connect();
     // Test the connection
     await client.db().command({ ping: 1 });
-    console.log('Successfully connected to MongoDB');
+    // Connection successful
     return client;
   } catch (error) {
     const mongoError = error as Error;
-    console.error('MongoDB Connection Error:', {
-      message: mongoError.message,
-      stack: mongoError.stack,
-      retries_left: retries
-    });
-
+    
     if (retries > 0) {
-      console.warn(`MongoDB connection failed, retrying... (${retries} attempts left)`);
       await new Promise(resolve => setTimeout(resolve, delay));
       return connectWithRetry(client, retries - 1, delay * 2);
     }
-    throw error;
+    
+    throw new Error(`MongoDB Connection Error: ${mongoError.message}`);
   }
 };
 

@@ -2,6 +2,12 @@
 
 ## Frontend
 
+### Frame Scaling Optimization (2024-03-20)
+- CSS transforms provide better performance than direct size manipulation
+- Viewport-based calculations ensure consistent frame display across devices
+- ResizeObserver API enables efficient viewport change handling
+- Transform-scale approach minimizes reflow and repaint operations
+
 ### Component Optimization (2025-07-21)
 - Named function components provide better debugging and Fast Refresh support
 - Proper cleanup in useEffect prevents memory leaks and improves stability

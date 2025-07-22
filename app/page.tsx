@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import ResponsiveScaler from './components/ResponsiveScaler';
 import { MessageOverlay } from './components/MessageOverlay';
 import { useLayersStore } from './store/layers';
+import { useCompositionStore } from './store/composition';
 import type { Layer, ITextLayer, IImageLayer } from './types/layers';
 
 function compareLayerOrder(a: Layer, b: Layer): number {
@@ -96,11 +98,11 @@ function CameraLayer(): JSX.Element {
       style={{ 
         position: 'absolute',
         width: '100%',
-        height: '100vh',
+        height: '100%',
         objectFit: 'cover',
         zIndex: 0,
         transform: 'scaleX(-1)' // Mirror the video horizontally
-      }} 
+      }}
     />
   );
 }
@@ -161,33 +163,49 @@ function LayerComponent({ layer }: { layer: Layer }): JSX.Element | null {
 }
 
 export default function Page(): JSX.Element {
-  const { layers, fetchLayers, isLoading, error } = useLayersStore();
+  const { layers, fetchLayers, isLoading: layersLoading, error: layersError } = useLayersStore();
+  const { aspectRatio, fetchComposition, isLoading: compositionLoading, error: compositionError } = useCompositionStore();
 
   useEffect(() => {
     fetchLayers();
-  }, [fetchLayers]);
+    fetchComposition();
+  }, [fetchLayers, fetchComposition]);
 
-  if (isLoading) {
-    return <MessageOverlay type="loading" message="Loading layers..." />;
+  if (layersLoading || compositionLoading) {
+    return <MessageOverlay type="loading" message="Loading..." />;
   }
 
-  if (error) {
-    return <MessageOverlay type="error" message={error} />;
+  if (layersError || compositionError) {
+    return <MessageOverlay type="error" message={layersError || compositionError || 'An error occurred'} />;
   }
 
   return (
-    <div style={{ 
-      position: 'relative', 
-      width: '100%', 
-      height: '100vh',
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#000',
       overflow: 'hidden'
     }}>
+      <ResponsiveScaler aspectRatio={aspectRatio.width / aspectRatio.height}>
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          overflow: 'hidden'
+        }}>
       {layers
         .filter(layer => layer.visible)
         .sort(compareLayerOrder)
         .map(layer => (
           <LayerComponent key={layer.id} layer={layer} />
         ))}
+        </div>
+      </ResponsiveScaler>
     </div>
   );
 }
