@@ -87,7 +87,7 @@ DEBUG=true
 ```env
 NODE_ENV=production
 PORT=8080
-DATABASE_URL=mongodb+srv://user:pass@cluster.mongodb.net/myapp
+DATABASE_URL=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>
 API_KEY=sk_live_xyz789
 LOG_LEVEL=error
 CACHE_TTL=7200
