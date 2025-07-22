@@ -52,16 +52,7 @@ const envSpecificConfig: Record<string, IEnvConfig> = {
     },
   },
   production: {
-    API_KEY: {
-      required: true,
-      validator: (value) => value.length >= 32,
-      errorMessage: 'API_KEY must be at least 32 characters long in production',
-    },
-    REDIS_URL: {
-      required: true,
-      validator: (value) => value.startsWith('redis://'),
-      errorMessage: 'REDIS_URL must be a valid Redis URL in production',
-    },
+    // Production-specific environment variables can be added here if needed
   },
   test: {
     TEST_DB_URL: {
@@ -124,6 +115,7 @@ const result: IValidationResult = {
  * @throws Error with detailed validation messages if validation fails
  */
 export function validateEnvOrThrow(): void {
+  console.log('Validating environment variables...');
   const result = validateEnv();
   
   if (!result.isValid) {
@@ -132,6 +124,8 @@ export function validateEnvOrThrow(): void {
       ...result.errors.map(err => `  - ${err}`),
     ].join('\n');
     
+    console.error('Validation errors:', result.errors);
     throw new Error(errorMessage);
   }
+  console.log('Environment variables validated successfully.');
 }

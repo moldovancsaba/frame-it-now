@@ -7,13 +7,19 @@ import type { NewLayer } from '../../types/layers';
 
 export async function GET(): Promise<NextResponse> {
   try {
+    console.log('Attempting to connect to MongoDB...');
     const client = await clientPromise;
     if (!client) {
       throw new Error('Failed to connect to MongoDB Atlas');
     }
     
     const dbName = process.env.MONGODB_DB || 'frameit';
+    console.log(`Using database: ${dbName}`);
     const db = client.db(dbName);
+    
+    // Verify database connection
+    await db.command({ ping: 1 });
+    console.log('Successfully connected to database');
     
     const layers = await db.collection('layers').find({}).toArray();
     // Convert MongoDB _id to string id for frontend
